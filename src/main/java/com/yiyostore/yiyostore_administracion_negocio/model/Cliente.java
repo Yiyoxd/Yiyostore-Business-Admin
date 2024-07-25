@@ -1,11 +1,11 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import java.time.LocalDate;
+import java.util.Objects;
+
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-
-import java.time.LocalDate;
-import java.util.Objects;
 
 /**
  * Representa un cliente. Incluye todos
@@ -16,7 +16,7 @@ import java.util.Objects;
 public class Cliente {
 
     private static final PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-
+                            
     /**
      * Identificador único del cliente asignado por el sistema.
      */
@@ -51,8 +51,6 @@ public class Cliente {
      * Notas sobre el cliente.
      */
     private String notas;
-
-    // Getters y setters
 
     /**
      * Obtiene el identificador único del cliente.
@@ -221,7 +219,7 @@ public class Cliente {
      */
     private boolean isValidPhoneNumber(String numeroTelefono) {
         try {
-            Phonenumber.PhoneNumber phoneNumber = phoneUtil.parse(numeroTelefono, "MX"); // Cambia "MX" por el código de país apropiado si es necesario
+            Phonenumber.PhoneNumber phoneNumber = phoneUtil.parse(numeroTelefono, "MX");
             return phoneUtil.isValidNumber(phoneNumber);
         } catch (NumberParseException e) {
             return false;
