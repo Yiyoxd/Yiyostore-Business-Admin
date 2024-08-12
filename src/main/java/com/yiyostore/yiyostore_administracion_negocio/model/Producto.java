@@ -1,54 +1,55 @@
- package com.yiyostore.yiyostore_administracion_negocio.model;
+package com.yiyostore.yiyostore_administracion_negocio.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
- * Representa un producto en el inventario. Incluye detalles como nombre, descripción, precio, 
- * costo, categoría, estado, fecha de adición y link de compra.
+ * Representa un producto en el inventario. Cada producto puede estar asociado a
+ * múltiples lotes, donde cada lote tiene un costo y cantidad disponible
+ * específicos.
  */
 public class Producto {
+
     private long id;
     private String nombre;
     private String descripcion;
     private double precio;
-    private double costo;
+    private List<LoteProducto> lotes; 
     private Categoria categoria;
     private Estado estado;
     private LocalDate fechaDeAdicion;
-    private String linkDeCompra;
 
     /**
      * Constructor vacío.
      */
     public Producto() {
+        this.lotes = new ArrayList<>();
     }
 
     /**
      * Constructor para inicializar un producto con todos sus atributos.
      *
-     * @param id             Identificador único del producto.
-     * @param nombre         Nombre del producto.
-     * @param descripcion    Descripción detallada del producto.
-     * @param precio         Precio del producto.
-     * @param costo          Costo del producto.
-     * @param categoria      Categoría del producto.
-     * @param estado         Estado del producto (nuevo, usado, reacondicionado, defectuoso).
+     * @param id Identificador único del producto.
+     * @param nombre Nombre del producto.
+     * @param descripcion Descripción detallada del producto.
+     * @param precio Precio de venta del producto.
+     * @param lotes Lista de lotes del producto.
+     * @param categoria Categoría del producto.
+     * @param estado Estado del producto (nuevo, usado, etc.).
      * @param fechaDeAdicion Fecha en que el producto fue añadido al inventario.
-     * @param linkDeCompra   Link de compra del producto.
      */
-    public Producto(long id, String nombre, String descripcion, double precio, double costo, Categoria categoria, Estado estado, LocalDate fechaDeAdicion, String linkDeCompra) {
+    public Producto(long id, String nombre, String descripcion, double precio, List<LoteProducto> lotes, Categoria categoria, Estado estado, LocalDate fechaDeAdicion) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
-        this.costo = costo;
+        this.lotes = lotes != null ? lotes : new ArrayList<>();
         this.categoria = categoria;
         this.estado = estado;
         this.fechaDeAdicion = fechaDeAdicion;
-        this.linkDeCompra = linkDeCompra;
     }
-
-    // Getters y Setters
 
     /**
      * Obtiene el identificador único del producto.
@@ -105,39 +106,39 @@ public class Producto {
     }
 
     /**
-     * Obtiene el precio del producto.
+     * Obtiene el precio de venta del producto.
      *
-     * @return El precio del producto.
+     * @return El precio de venta del producto.
      */
     public double getPrecio() {
         return precio;
     }
 
     /**
-     * Establece el precio del producto.
+     * Establece el precio de venta del producto.
      *
-     * @param precio El nuevo precio del producto.
+     * @param precio El nuevo precio de venta del producto.
      */
     public void setPrecio(double precio) {
         this.precio = precio;
     }
 
     /**
-     * Obtiene el costo del producto.
+     * Obtiene la lista de lotes asociados al producto.
      *
-     * @return El costo del producto.
+     * @return La lista de lotes asociados al producto.
      */
-    public double getCosto() {
-        return costo;
+    public List<LoteProducto> getLotes() {
+        return lotes;
     }
 
     /**
-     * Establece el costo del producto.
+     * Establece la lista de lotes asociados al producto.
      *
-     * @param costo El nuevo costo del producto.
+     * @param lotes La nueva lista de lotes asociados al producto.
      */
-    public void setCosto(double costo) {
-        this.costo = costo;
+    public void setLotes(List<LoteProducto> lotes) {
+        this.lotes = lotes;
     }
 
     /**
@@ -194,56 +195,116 @@ public class Producto {
         this.fechaDeAdicion = fechaDeAdicion;
     }
 
+    // Métodos adicionales
     /**
-     * Obtiene el link de compra del producto.
+     * Agrega un lote a la lista de lotes del producto.
      *
-     * @return El link de compra del producto.
+     * @param lote El lote a agregar.
      */
-    public String getLinkDeCompra() {
-        return linkDeCompra;
+    public void agregarLote(LoteProducto lote) {
+        this.lotes.add(lote);
     }
 
     /**
-     * Establece el link de compra del producto.
+     * Remueve un lote específico de la lista de lotes del producto.
      *
-     * @param linkDeCompra El nuevo link de compra del producto.
+     * @param idLote El identificador del lote a remover.
+     * @return true si el lote fue removido, false si no se encontró.
      */
-    public void setLinkDeCompra(String linkDeCompra) {
-        this.linkDeCompra = linkDeCompra;
+    public boolean removerLote(long idLote) {
+        return this.lotes.removeIf(lote -> lote.getId() == idLote);
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Producto {")
-          .append("\n  ID=").append(id)
-          .append(",\n  Nombre='").append(nombre).append('\'')
-          .append(",\n  Descripción='").append(descripcion).append('\'')
-          .append(",\n  Precio=").append(precio)
-          .append(",\n  Costo=").append(costo)
-          .append(",\n  Categoría=").append(categoria)
-          .append(",\n  Estado=").append(estado)
-          .append(",\n  Fecha de Adición=").append(fechaDeAdicion)
-          .append(",\n  Link de Compra='").append(linkDeCompra).append('\'')
-          .append("\n}");
-        return sb.toString();
+    /**
+     * Obtiene la cantidad total disponible del producto sumando las cantidades
+     * de todos los lotes.
+     *
+     * @return La cantidad total disponible del producto.
+     */
+    public int obtenerCantidadTotalDisponible() {
+        return this.lotes.stream().mapToInt(LoteProducto::getCantidadDisponible).sum();
     }
 
+    /**
+     * Encuentra un lote por su identificador.
+     *
+     * @param idLote El identificador del lote a buscar.
+     * @return El lote encontrado, o un Optional vacío si no se encuentra.
+     */
+    public Optional<LoteProducto> encontrarLotePorId(long idLote) {
+        return this.lotes.stream().filter(lote -> lote.getId() == idLote).findFirst();
+    }
+
+    /**
+     * Calcula el costo promedio ponderado del producto basado en los lotes
+     * disponibles.
+     *
+     * @return El costo promedio ponderado del producto.
+     */
+    public double calcularCostoPromedioPonderado() {
+        double costoTotal = 0;
+        int cantidadTotal = 0;
+
+        for (LoteProducto lote : this.lotes) {
+            costoTotal += lote.getCosto() * lote.getCantidadDisponible();
+            cantidadTotal += lote.getCantidadDisponible();
+        }
+
+        return cantidadTotal > 0 ? costoTotal / cantidadTotal : 0;
+    }
+
+    /**
+     * Compara este producto con otro objeto para verificar si son iguales.
+     *
+     * @param o El objeto a comparar.
+     * @return true si los objetos son iguales, false en caso contrario.
+     */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Producto producto = (Producto) o;
 
         return id == producto.id;
     }
 
+    /**
+     * Genera un código hash para este producto basado en su identificador,
+     * nombre y categoría.
+     *
+     * @return El código hash generado.
+     */
     @Override
     public int hashCode() {
         int result = Long.hashCode(id);
         result = 31 * result + (nombre != null ? nombre.hashCode() : 0);
         result = 31 * result + (categoria != null ? categoria.hashCode() : 0);
         return result;
+    }
+
+    /**
+     * Devuelve una representación en forma de cadena de este producto.
+     *
+     * @return Una cadena que representa el producto.
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Producto {")
+                .append("\n  id=").append(id)
+                .append(",\n  nombre='").append(nombre).append('\'')
+                .append(",\n  descripcion='").append(descripcion).append('\'')
+                .append(",\n  precio=").append(precio)
+                .append(",\n  lotes=").append(lotes)
+                .append(",\n  categoria=").append(categoria)
+                .append(",\n  estado=").append(estado)
+                .append(",\n  fechaDeAdicion=").append(fechaDeAdicion)
+                .append("\n}");
+        return sb.toString();
     }
 }
