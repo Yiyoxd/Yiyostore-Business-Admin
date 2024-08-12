@@ -6,7 +6,7 @@ import java.util.Objects;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-
+ 
 /**
  * Representa un cliente. Incluye todos
  * los detalles necesarios para administrar la relación con el cliente, como

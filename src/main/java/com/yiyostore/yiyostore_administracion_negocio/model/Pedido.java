@@ -4,7 +4,7 @@ package com.yiyostore.yiyostore_administracion_negocio.model;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-
+ 
 /**
  * Representa un pedido realizado por un cliente. Incluye información sobre el cliente, 
  * los productos pedidos, la fecha del pedido, la fecha de entrega, el estado del pedido,

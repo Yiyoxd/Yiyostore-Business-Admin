@@ -1,7 +1,7 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
 import java.util.Objects;
-
+ 
 /**
  * Representa una Colonia con su información básica.
  */

@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Representa un producto dentro de un pedido. Incluye información sobre el producto, 
  * la cantidad pedida y el precio del producto en el pedido.
- */
+ */ 
 public class ProductoPedido {
     private Long id;
     private Producto producto;

@@ -1,4 +1,4 @@
-package com.yiyostore.yiyostore_administracion_negocio.model;
+ package com.yiyostore.yiyostore_administracion_negocio.model;
 
 import java.time.LocalDate;
 
