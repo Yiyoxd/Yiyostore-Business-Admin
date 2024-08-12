@@ -1,6 +1,5 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -8,8 +7,7 @@ import java.util.Objects;
  * nombre de la calle, número exterior, número interior, colonia, ciudad,
  * y calles entre las que está ubicada, junto con referencia o detalles adicionales.
  */
-public class Direccion implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Direccion {
 
     /**
      * Identificador único de la dirección.
@@ -284,7 +282,7 @@ public class Direccion implements Serializable {
      * Calcula el código hash de este objeto Direccion.
      *
      * @return El código hash de la dirección.
-     */
+     */ 
     @Override
     public int hashCode() {
         return Objects.hash(id);
