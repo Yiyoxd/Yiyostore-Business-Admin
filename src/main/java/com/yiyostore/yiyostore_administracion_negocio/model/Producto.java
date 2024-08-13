@@ -5,24 +5,78 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
 /**
  * Representa un producto en el inventario. Cada producto puede estar asociado a
  * múltiples lotes, donde cada lote tiene un costo y cantidad disponible
  * específicos.
  */
+@Entity
+@Table(name = "productos")
 public class Producto {
 
+    /**
+     * Identificador único del producto.
+     */
+    @Id
+    @Column(name = "id", nullable = false)
     private long id;
+
+    /**
+     * Nombre del producto.
+     */
+    @Column(name = "nombre", nullable = false)
     private String nombre;
+
+    /**
+     * Descripción detallada del producto.
+     */
+    @Column(name = "descripcion")
     private String descripcion;
+
+    /**
+     * Precio de venta del producto.
+     */
+    @Column(name = "precio", nullable = false)
     private double precio;
-    private List<LoteProducto> lotes; 
+
+    /**
+     * Lista de lotes asociados al producto.
+     */
+    @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LoteProducto> lotes;
+
+    /**
+     * Categoría del producto.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria")
     private Categoria categoria;
+
+    /**
+     * Estado del producto (nuevo, usado, etc.).
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado")
     private Estado estado;
+
+    /**
+     * Fecha en que el producto fue añadido al inventario.
+     */
+    @Column(name = "fecha_adicion")
     private LocalDate fechaDeAdicion;
 
     /**
-     * Constructor vacío.
+     * Constructor vacío requerido por JPA.
      */
     public Producto() {
         this.lotes = new ArrayList<>();
@@ -195,7 +249,6 @@ public class Producto {
         this.fechaDeAdicion = fechaDeAdicion;
     }
 
-    // Métodos adicionales
     /**
      * Agrega un lote a la lista de lotes del producto.
      *

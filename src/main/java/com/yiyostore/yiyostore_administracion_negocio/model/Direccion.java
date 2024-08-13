@@ -1,74 +1,99 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.util.Objects;
 
 /**
- * La clase Direccion representa una dirección física con atributos detallados como
- * nombre de la calle, número exterior, número interior, colonia, ciudad,
- * y calles entre las que está ubicada, junto con referencia o detalles adicionales.
+ * La clase Direccion representa una dirección física con atributos detallados
+ * como nombre de la calle, número exterior, número interior, colonia, ciudad, y
+ * calles entre las que está ubicada, junto con referencia o detalles
+ * adicionales.
  */
+@Entity
+@Table(name = "direcciones")
 public class Direccion {
 
     /**
      * Identificador único de la dirección.
      */
+    @Id
+    @Column(name = "id", nullable = false)
     private long id;
-    
+
     /**
      * Nombre de la calle.
      */
+    @Column(name = "nombre_calle", length = 100)
     private String nombreCalle;
 
     /**
      * Número exterior del domicilio.
      */
+    @Column(name = "numero_exterior", length = 10)
     private String numeroExterior;
 
     /**
      * Número interior o apartamento (puede ser null).
      */
+    @Column(name = "numero_interior", length = 10)
     private String numeroInterior;
 
     /**
      * Colonia o barrio.
      */
+    @ManyToOne
+    @JoinColumn(name = "colonia_id")
     private Colonia colonia;
 
     /**
      * Ciudad en la que se encuentra el domicilio.
      */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ciudad")
     private Ciudad ciudad;
 
     /**
      * Primera calle entre la que está ubicada la dirección.
      */
+    @Column(name = "entre_calle_1", length = 100)
     private String entreCalle1;
 
     /**
      * Segunda calle entre la que está ubicada la dirección.
      */
+    @Column(name = "entre_calle_2", length = 100)
     private String entreCalle2;
 
     /**
      * Detalles adicionales o referencia de la dirección.
      */
+    @Column(name = "referencia", length = 255)
     private String referencia;
 
     /**
      * Constructor para inicializar una dirección con todos sus atributos.
      *
-     * @param id             El identificador único de la dirección.
-     * @param nombreCalle    El nombre de la calle.
+     * @param id El identificador único de la dirección.
+     * @param nombreCalle El nombre de la calle.
      * @param numeroExterior El número exterior del domicilio.
      * @param numeroInterior El número interior o apartamento (puede ser null).
-     * @param colonia        La colonia o barrio.
-     * @param ciudad         La ciudad en la que se encuentra el domicilio.
-     * @param entreCalle1    La primera calle entre la que está ubicada la dirección.
-     * @param entreCalle2    La segunda calle entre la que está ubicada la dirección.
-     * @param referencia     Detalles adicionales o referencia de la dirección.
+     * @param colonia La colonia o barrio.
+     * @param ciudad La ciudad en la que se encuentra el domicilio.
+     * @param entreCalle1 La primera calle entre la que está ubicada la
+     * dirección.
+     * @param entreCalle2 La segunda calle entre la que está ubicada la
+     * dirección.
+     * @param referencia Detalles adicionales o referencia de la dirección.
      */
     public Direccion(long id, String nombreCalle, String numeroExterior, String numeroInterior, Colonia colonia,
-                     Ciudad ciudad, String entreCalle1, String entreCalle2, String referencia) {
+            Ciudad ciudad, String entreCalle1, String entreCalle2, String referencia) {
         this.id = id;
         this.nombreCalle = nombreCalle;
         this.numeroExterior = numeroExterior;
@@ -200,7 +225,8 @@ public class Direccion {
     /**
      * Establece la primera calle entre la que está ubicada la dirección.
      *
-     * @param entreCalle1 La primera calle entre la que está ubicada la dirección.
+     * @param entreCalle1 La primera calle entre la que está ubicada la
+     * dirección.
      */
     public void setEntreCalle1(String entreCalle1) {
         this.entreCalle1 = entreCalle1;
@@ -218,7 +244,8 @@ public class Direccion {
     /**
      * Establece la segunda calle entre la que está ubicada la dirección.
      *
-     * @param entreCalle2 La segunda calle entre la que está ubicada la dirección.
+     * @param entreCalle2 La segunda calle entre la que está ubicada la
+     * dirección.
      */
     public void setEntreCalle2(String entreCalle2) {
         this.entreCalle2 = entreCalle2;
@@ -251,16 +278,16 @@ public class Direccion {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Direccion{")
-          .append("id=").append(id)
-          .append(", nombreCalle='").append(nombreCalle).append('\'')
-          .append(", numeroExterior='").append(numeroExterior).append('\'')
-          .append(", numeroInterior='").append(numeroInterior).append('\'')
-          .append(", colonia=").append(colonia)
-          .append(", ciudad=").append(ciudad)
-          .append(", entreCalle1='").append(entreCalle1).append('\'')
-          .append(", entreCalle2='").append(entreCalle2).append('\'')
-          .append(", referencia='").append(referencia).append('\'')
-          .append('}');
+                .append("id=").append(id)
+                .append(", nombreCalle='").append(nombreCalle).append('\'')
+                .append(", numeroExterior='").append(numeroExterior).append('\'')
+                .append(", numeroInterior='").append(numeroInterior).append('\'')
+                .append(", colonia=").append(colonia)
+                .append(", ciudad=").append(ciudad)
+                .append(", entreCalle1='").append(entreCalle1).append('\'')
+                .append(", entreCalle2='").append(entreCalle2).append('\'')
+                .append(", referencia='").append(referencia).append('\'')
+                .append('}');
         return sb.toString();
     }
 
@@ -272,8 +299,12 @@ public class Direccion {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Direccion direccion = (Direccion) o;
         return id == direccion.id;
     }
@@ -282,9 +313,9 @@ public class Direccion {
      * Calcula el código hash de este objeto Direccion.
      *
      * @return El código hash de la dirección.
-     */ 
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    } 
-} 
+    }
+}

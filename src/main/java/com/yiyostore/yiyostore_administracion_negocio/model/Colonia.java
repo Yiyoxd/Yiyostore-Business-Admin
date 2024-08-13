@@ -1,24 +1,35 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import java.util.Objects;
- 
+
 /**
  * Representa una Colonia con su información básica.
  */
+@Entity
+@Table(name = "colonias")
 public class Colonia {
+
     /**
      * El código postal de la colonia.
      */
+    @Id
+    @Column(name = "codigo_postal", nullable = false)
     private int codigoPostal;
-    
+
     /**
      * El nombre de la colonia.
      */
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
-    
+
     /**
      * El tipo de la colonia (Rural o Urbano).
      */
+    @Column(name = "tipo", nullable = false)
     private TipoColonia tipo;
 
     /**
@@ -95,11 +106,11 @@ public class Colonia {
      */
     @Override
     public String toString() {
-        return "Colonia{" +
-                "codigoPostal=" + codigoPostal +
-                ", nombre='" + nombre + '\'' +
-                ", tipo=" + tipo+
-                '}';
+        return "Colonia{"
+                + "codigoPostal=" + codigoPostal
+                + ", nombre='" + nombre + '\''
+                + ", tipo=" + tipo
+                + '}';
     }
 
     @Override
@@ -119,7 +130,7 @@ public class Colonia {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        
+
         final Colonia otra = (Colonia) obj;
         return nombre.equalsIgnoreCase(otra.nombre)
                 && codigoPostal == otra.codigoPostal
