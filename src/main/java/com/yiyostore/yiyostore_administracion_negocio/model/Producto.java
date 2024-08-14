@@ -4,16 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 /**
  * Representa un producto en el inventario. Cada producto puede estar asociado a
@@ -25,11 +16,13 @@ import jakarta.persistence.Table;
 public class Producto {
 
     /**
-     * Identificador único del producto.
+     * Identificador único del producto. Generado automáticamente por la base de
+     * datos.
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private long id;
+    private Long id;
 
     /**
      * Nombre del producto.
@@ -85,7 +78,6 @@ public class Producto {
     /**
      * Constructor para inicializar un producto con todos sus atributos.
      *
-     * @param id Identificador único del producto.
      * @param nombre Nombre del producto.
      * @param descripcion Descripción detallada del producto.
      * @param precio Precio de venta del producto.
@@ -94,8 +86,7 @@ public class Producto {
      * @param estado Estado del producto (nuevo, usado, etc.).
      * @param fechaDeAdicion Fecha en que el producto fue añadido al inventario.
      */
-    public Producto(long id, String nombre, String descripcion, double precio, List<LoteProducto> lotes, Categoria categoria, Estado estado, LocalDate fechaDeAdicion) {
-        this.id = id;
+    public Producto(String nombre, String descripcion, double precio, List<LoteProducto> lotes, Categoria categoria, Estado estado, LocalDate fechaDeAdicion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
@@ -105,21 +96,23 @@ public class Producto {
         this.fechaDeAdicion = fechaDeAdicion;
     }
 
+    // Getters y Setters
     /**
      * Obtiene el identificador único del producto.
      *
      * @return El identificador del producto.
      */
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
     /**
-     * Establece el identificador único del producto.
+     * Establece el identificador único del producto. Este método puede no ser
+     * necesario si se usa generación automática de ID.
      *
      * @param id El nuevo identificador del producto.
      */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -310,7 +303,8 @@ public class Producto {
      * Compara este producto con otro objeto para verificar si son iguales.
      *
      * @param o El objeto a comparar.
-     * @return true si los objetos son iguales, false en caso contrario.
+     * @return true si los objetos son iguales (misma id), false en caso
+     * contrario.
      */
     @Override
     public boolean equals(Object o) {
@@ -320,10 +314,8 @@ public class Producto {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         Producto producto = (Producto) o;
-
-        return id == producto.id;
+        return id != null ? id.equals(producto.id) : producto.id == null;
     }
 
     /**
@@ -334,7 +326,7 @@ public class Producto {
      */
     @Override
     public int hashCode() {
-        int result = Long.hashCode(id);
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (nombre != null ? nombre.hashCode() : 0);
         result = 31 * result + (categoria != null ? categoria.hashCode() : 0);
         return result;

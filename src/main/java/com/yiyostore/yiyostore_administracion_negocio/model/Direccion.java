@@ -6,15 +6,14 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import java.util.Objects;
 
 /**
- * La clase Direccion representa una dirección física con atributos detallados
- * como nombre de la calle, número exterior, número interior, colonia, ciudad, y
- * calles entre las que está ubicada, junto con referencia o detalles
- * adicionales.
+ * La clase Direccion representa una dirección física detallada, incluyendo
+ * nombre de la calle, número exterior e interior, colonia, ciudad y calles
+ * cercanas, junto con detalles adicionales.
  */
 @Entity
 @Table(name = "direcciones")
@@ -24,8 +23,9 @@ public class Direccion {
      * Identificador único de la dirección.
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private long id;
+    private Long id;
 
     /**
      * Nombre de la calle.
@@ -40,13 +40,13 @@ public class Direccion {
     private String numeroExterior;
 
     /**
-     * Número interior o apartamento (puede ser null).
+     * Número interior o apartamento. Puede ser nulo si no aplica.
      */
     @Column(name = "numero_interior", length = 10)
     private String numeroInterior;
 
     /**
-     * Colonia o barrio.
+     * Colonia o barrio donde se encuentra la dirección.
      */
     @ManyToOne
     @JoinColumn(name = "colonia_id")
@@ -55,9 +55,8 @@ public class Direccion {
     /**
      * Ciudad en la que se encuentra el domicilio.
      */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ciudad")
-    private Ciudad ciudad;
+    @Column(name = "ciudad", length = 100, nullable = false)
+    private String ciudad;
 
     /**
      * Primera calle entre la que está ubicada la dirección.
@@ -78,6 +77,12 @@ public class Direccion {
     private String referencia;
 
     /**
+     * Constructor por defecto necesario para JPA.
+     */
+    public Direccion() {
+    }
+
+    /**
      * Constructor para inicializar una dirección con todos sus atributos.
      *
      * @param id El identificador único de la dirección.
@@ -92,8 +97,8 @@ public class Direccion {
      * dirección.
      * @param referencia Detalles adicionales o referencia de la dirección.
      */
-    public Direccion(long id, String nombreCalle, String numeroExterior, String numeroInterior, Colonia colonia,
-            Ciudad ciudad, String entreCalle1, String entreCalle2, String referencia) {
+    public Direccion(Long id, String nombreCalle, String numeroExterior, String numeroInterior, Colonia colonia,
+            String ciudad, String entreCalle1, String entreCalle2, String referencia) {
         this.id = id;
         this.nombreCalle = nombreCalle;
         this.numeroExterior = numeroExterior;
@@ -110,7 +115,7 @@ public class Direccion {
      *
      * @return El identificador único de la dirección.
      */
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -119,7 +124,7 @@ public class Direccion {
      *
      * @param id El identificador único de la dirección.
      */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -178,7 +183,7 @@ public class Direccion {
     }
 
     /**
-     * Obtiene la colonia o barrio.
+     * Obtiene la colonia o barrio donde se encuentra la dirección.
      *
      * @return La colonia o barrio.
      */
@@ -187,7 +192,7 @@ public class Direccion {
     }
 
     /**
-     * Establece la colonia o barrio.
+     * Establece la colonia o barrio donde se encuentra la dirección.
      *
      * @param colonia La colonia o barrio.
      */
@@ -200,7 +205,7 @@ public class Direccion {
      *
      * @return La ciudad en la que se encuentra el domicilio.
      */
-    public Ciudad getCiudad() {
+    public String getCiudad() {
         return ciudad;
     }
 
@@ -209,7 +214,7 @@ public class Direccion {
      *
      * @param ciudad La ciudad en la que se encuentra el domicilio.
      */
-    public void setCiudad(Ciudad ciudad) {
+    public void setCiudad(String ciudad) {
         this.ciudad = ciudad;
     }
 
@@ -283,7 +288,7 @@ public class Direccion {
                 .append(", numeroExterior='").append(numeroExterior).append('\'')
                 .append(", numeroInterior='").append(numeroInterior).append('\'')
                 .append(", colonia=").append(colonia)
-                .append(", ciudad=").append(ciudad)
+                .append(", ciudad='").append(ciudad).append('\'')
                 .append(", entreCalle1='").append(entreCalle1).append('\'')
                 .append(", entreCalle2='").append(entreCalle2).append('\'')
                 .append(", referencia='").append(referencia).append('\'')
@@ -295,7 +300,8 @@ public class Direccion {
      * Compara este objeto Direccion con otro para verificar si son iguales.
      *
      * @param o El objeto a comparar.
-     * @return true si los objetos son iguales, false en caso contrario.
+     * @return true si los objetos son iguales (misma id), false en caso
+     * contrario.
      */
     @Override
     public boolean equals(Object o) {
@@ -306,13 +312,13 @@ public class Direccion {
             return false;
         }
         Direccion direccion = (Direccion) o;
-        return id == direccion.id;
+        return id.equals(direccion.id);
     }
 
     /**
      * Calcula el código hash de este objeto Direccion.
      *
-     * @return El código hash de la dirección.
+     * @return El código hash basado en el identificador único.
      */
     @Override
     public int hashCode() {

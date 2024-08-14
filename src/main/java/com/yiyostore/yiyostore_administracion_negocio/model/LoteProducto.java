@@ -1,103 +1,110 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import jakarta.persistence.*;
 import java.util.Objects;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
 /**
- * Representa un lote específico de un producto en el inventario.
- * Cada lote tiene su propio costo y cantidad disponible, y está asociado a un producto.
+ * Entidad que representa un lote específico de un producto en el inventario.
+ * Cada lote tiene su propio costo y cantidad disponible, y está asociado a un
+ * producto.
  */
 @Entity
 @Table(name = "lotes_productos")
 public class LoteProducto {
 
     /**
-     * Identificador único del lote.
+     * Identificador único del lote. Auto-generado por la base de datos.
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private long id;
+    private Long id;
 
     /**
-     * El producto al que pertenece este lote.
-     * Este campo establece la relación muchos a uno entre LoteProducto y Producto.
+     * El producto al que pertenece este lote. Este campo establece la relación
+     * muchos a uno entre LoteProducto y Producto.
      */
     @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
     /**
-     * Costo del producto en este lote.
-     * Este valor puede ser diferente entre lotes, incluso para el mismo producto.
+     * Costo del producto en este lote. Este valor puede ser diferente entre
+     * lotes, incluso para el mismo producto.
      */
     @Column(name = "costo")
     private double costo;
 
     /**
-     * Cantidad disponible de productos en este lote.
-     * Este valor representa el inventario actual para este lote específico.
+     * Cantidad disponible de productos en este lote. Este valor representa el
+     * inventario actual para este lote específico.
      */
     @Column(name = "cantidad_disponible")
     private int cantidadDisponible;
 
     /**
-     * Constructor vacío. Es necesario para JPA.
+     * Link de compra para el lote. Este valor es la URL desde donde se puede
+     * adquirir el lote.
+     */
+    @Column(name = "link_de_compra")
+    private String linkDeCompra;
+
+    /**
+     * Constructor vacío requerido por JPA.
      */
     public LoteProducto() {
     }
 
     /**
-     * Constructor para inicializar un lote de producto con todos sus atributos.
+     * Constructor completo para inicializar un lote de producto con todos sus
+     * atributos.
      *
      * @param id Identificador único del lote.
      * @param costo Costo del producto en este lote.
      * @param cantidadDisponible Cantidad disponible de productos en este lote.
      * @param producto El producto al que pertenece este lote.
+     * @param linkDeCompra Link de compra del lote.
      */
-    public LoteProducto(long id, double costo, int cantidadDisponible, Producto producto) {
+    public LoteProducto(Long id, double costo, int cantidadDisponible, Producto producto, String linkDeCompra) {
         this.id = id;
         this.costo = costo;
         this.cantidadDisponible = cantidadDisponible;
         this.producto = producto;
+        this.linkDeCompra = linkDeCompra;
     }
 
+    // Getters y Setters
     /**
      * Obtiene el identificador único del lote.
      *
-     * @return El identificador del lote.
+     * @return ID del lote.
      */
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
     /**
      * Establece el identificador único del lote.
      *
-     * @param id El nuevo identificador del lote.
+     * @param id ID del lote.
      */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     /**
-     * Obtiene el producto asociado a este lote.
+     * Obtiene el producto al que pertenece este lote.
      *
-     * @return El producto asociado.
+     * @return Producto asociado al lote.
      */
     public Producto getProducto() {
         return producto;
     }
 
     /**
-     * Establece el producto asociado a este lote.
+     * Establece el producto al que pertenece este lote.
      *
-     * @param producto El nuevo producto asociado.
+     * @param producto Producto al que se asociará el lote.
      */
     public void setProducto(Producto producto) {
         this.producto = producto;
@@ -106,7 +113,7 @@ public class LoteProducto {
     /**
      * Obtiene el costo del producto en este lote.
      *
-     * @return El costo del producto en este lote.
+     * @return Costo del producto.
      */
     public double getCosto() {
         return costo;
@@ -115,20 +122,16 @@ public class LoteProducto {
     /**
      * Establece el costo del producto en este lote.
      *
-     * @param costo El nuevo costo del producto en este lote.
-     * @throws IllegalArgumentException si el costo es negativo.
+     * @param costo Costo del producto.
      */
     public void setCosto(double costo) {
-        if (costo < 0) {
-            throw new IllegalArgumentException("El costo no puede ser negativo.");
-        }
         this.costo = costo;
     }
 
     /**
      * Obtiene la cantidad disponible de productos en este lote.
      *
-     * @return La cantidad disponible de productos en este lote.
+     * @return Cantidad disponible.
      */
     public int getCantidadDisponible() {
         return cantidadDisponible;
@@ -137,58 +140,74 @@ public class LoteProducto {
     /**
      * Establece la cantidad disponible de productos en este lote.
      *
-     * @param cantidadDisponible La nueva cantidad disponible de productos en este lote.
-     * @throws IllegalArgumentException si la cantidad disponible es negativa.
+     * @param cantidadDisponible Cantidad disponible.
      */
     public void setCantidadDisponible(int cantidadDisponible) {
-        if (cantidadDisponible < 0) {
-            throw new IllegalArgumentException("La cantidad disponible no puede ser negativa.");
-        }
         this.cantidadDisponible = cantidadDisponible;
     }
 
     /**
-     * Devuelve una representación en forma de cadena del lote de producto.
-     * Incluye el identificador, el costo, la cantidad disponible, y el nombre del producto asociado.
+     * Obtiene el link de compra para el lote.
      *
-     * @return Una cadena que representa el lote de producto.
+     * @return Link de compra del lote.
      */
-    @Override
-    public String toString() {
-        return "LoteProducto{"
-                + "id=" + id
-                + ", producto=" + (producto != null ? producto.getNombre() : "null")
-                + ", costo=" + costo
-                + ", cantidadDisponible=" + cantidadDisponible
-                + '}';
+    public String getLinkDeCompra() {
+        return linkDeCompra;
     }
 
     /**
-     * Compara este objeto LoteProducto con otro para verificar si son iguales.
-     * Dos lotes son considerados iguales si tienen el mismo identificador.
+     * Establece el link de compra para el lote.
      *
-     * @param o El objeto a comparar.
-     * @return true si los objetos son iguales, false en caso contrario.
+     * @param linkDeCompra Link de compra del lote.
      */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        LoteProducto that = (LoteProducto) o;
-        return id == that.id;
+    public void setLinkDeCompra(String linkDeCompra) {
+        this.linkDeCompra = linkDeCompra;
     }
 
     /**
-     * Calcula el código hash de este objeto LoteProducto.
+     * Calcula el hashcode del objeto basado en el ID del lote.
      *
-     * @return El código hash del lote de producto.
+     * @return Hashcode del lote.
      */
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    /**
+     * Compara este objeto con otro para determinar si son iguales.
+     *
+     * @param obj Objeto con el cual comparar.
+     * @return true si los objetos son iguales (misma id), false en caso
+     * contrario.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        LoteProducto that = (LoteProducto) obj;
+        return Objects.equals(id, that.id);
+    }
+
+    /**
+     * Representación en cadena del objeto LoteProducto.
+     *
+     * @return Cadena que representa el objeto.
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("LoteProducto{")
+                .append("id=").append(id)
+                .append(", producto=").append(producto)
+                .append(", costo=").append(costo)
+                .append(", cantidadDisponible=").append(cantidadDisponible)
+                .append(", linkDeCompra='").append(linkDeCompra).append('\'')
+                .append('}');
+        return sb.toString();
     }
 }

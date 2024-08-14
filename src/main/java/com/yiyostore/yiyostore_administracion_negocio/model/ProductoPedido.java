@@ -71,6 +71,7 @@ public class ProductoPedido {
         this.precio = precio;
     }
 
+    // Getters y Setters
     /**
      * Obtiene el identificador único de la relación producto-pedido.
      *
