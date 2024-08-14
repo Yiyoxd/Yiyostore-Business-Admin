@@ -1,15 +1,16 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import jakarta.persistence.*;
+import java.util.Set;
 
 /**
  * Representa un producto en el inventario. Cada producto puede estar asociado a
- * múltiples lotes, donde cada lote tiene un costo y cantidad disponible
- * específicos.
+ * múltiples lotes y categorías.
  */
 @Entity
 @Table(name = "productos")
@@ -45,22 +46,19 @@ public class Producto {
     /**
      * Lista de lotes asociados al producto.
      */
-    @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LoteProducto> lotes;
+    @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<LoteProducto> lotes = new ArrayList<>();
 
     /**
-     * Categoría del producto.
+     * Categorías a las que pertenece el producto.
      */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "categoria")
-    private Categoria categoria;
-
-    /**
-     * Estado del producto (nuevo, usado, etc.).
-     */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "estado")
-    private Estado estado;
+    @ManyToMany
+    @JoinTable(
+            name = "producto_categoria",
+            joinColumns = @JoinColumn(name = "producto_id"),
+            inverseJoinColumns = @JoinColumn(name = "categoria_id")
+    )
+    private Set<Categoria> categorias = new HashSet<>();
 
     /**
      * Fecha en que el producto fue añadido al inventario.
@@ -72,7 +70,6 @@ public class Producto {
      * Constructor vacío requerido por JPA.
      */
     public Producto() {
-        this.lotes = new ArrayList<>();
     }
 
     /**
@@ -82,21 +79,18 @@ public class Producto {
      * @param descripcion Descripción detallada del producto.
      * @param precio Precio de venta del producto.
      * @param lotes Lista de lotes del producto.
-     * @param categoria Categoría del producto.
-     * @param estado Estado del producto (nuevo, usado, etc.).
+     * @param categorias Categorías del producto.
      * @param fechaDeAdicion Fecha en que el producto fue añadido al inventario.
      */
-    public Producto(String nombre, String descripcion, double precio, List<LoteProducto> lotes, Categoria categoria, Estado estado, LocalDate fechaDeAdicion) {
+    public Producto(String nombre, String descripcion, double precio, List<LoteProducto> lotes, Set<Categoria> categorias, LocalDate fechaDeAdicion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
         this.lotes = lotes != null ? lotes : new ArrayList<>();
-        this.categoria = categoria;
-        this.estado = estado;
+        this.categorias = categorias != null ? categorias : new HashSet<>();
         this.fechaDeAdicion = fechaDeAdicion;
     }
 
-    // Getters y Setters
     /**
      * Obtiene el identificador único del producto.
      *
@@ -107,8 +101,7 @@ public class Producto {
     }
 
     /**
-     * Establece el identificador único del producto. Este método puede no ser
-     * necesario si se usa generación automática de ID.
+     * Establece el identificador único del producto.
      *
      * @param id El nuevo identificador del producto.
      */
@@ -189,39 +182,21 @@ public class Producto {
     }
 
     /**
-     * Obtiene la categoría del producto.
+     * Obtiene las categorías a las que pertenece el producto.
      *
-     * @return La categoría del producto.
+     * @return El conjunto de categorías asociadas al producto.
      */
-    public Categoria getCategoria() {
-        return categoria;
+    public Set<Categoria> getCategorias() {
+        return categorias;
     }
 
     /**
-     * Establece la categoría del producto.
+     * Establece las categorías a las que pertenece el producto.
      *
-     * @param categoria La nueva categoría del producto.
+     * @param categorias El nuevo conjunto de categorías asociadas al producto.
      */
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
-    }
-
-    /**
-     * Obtiene el estado del producto.
-     *
-     * @return El estado del producto.
-     */
-    public Estado getEstado() {
-        return estado;
-    }
-
-    /**
-     * Establece el estado del producto.
-     *
-     * @param estado El nuevo estado del producto.
-     */
-    public void setEstado(Estado estado) {
-        this.estado = estado;
+    public void setCategorias(Set<Categoria> categorias) {
+        this.categorias = categorias;
     }
 
     /**
@@ -319,17 +294,13 @@ public class Producto {
     }
 
     /**
-     * Genera un código hash para este producto basado en su identificador,
-     * nombre y categoría.
+     * Genera un código hash para este producto basado en su identificador.
      *
      * @return El código hash generado.
      */
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (nombre != null ? nombre.hashCode() : 0);
-        result = 31 * result + (categoria != null ? categoria.hashCode() : 0);
-        return result;
+        return id != null ? id.hashCode() : 0;
     }
 
     /**
@@ -346,8 +317,7 @@ public class Producto {
                 .append(",\n  descripcion='").append(descripcion).append('\'')
                 .append(",\n  precio=").append(precio)
                 .append(",\n  lotes=").append(lotes)
-                .append(",\n  categoria=").append(categoria)
-                .append(",\n  estado=").append(estado)
+                .append(",\n  categorias=").append(categorias)
                 .append(",\n  fechaDeAdicion=").append(fechaDeAdicion)
                 .append("\n}");
         return sb.toString();
