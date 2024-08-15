@@ -8,6 +8,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import java.util.Objects;
 
 /**
@@ -40,8 +42,9 @@ public class Colonia {
     /**
      * La ciudad a la que pertenece la colonia.
      */
-    @Column(name = "ciudad", nullable = false, length = 100)
-    private String ciudad;
+    @ManyToOne
+    @JoinColumn(name = "ciudad_id", nullable = false)
+    private Ciudad ciudad;
 
     /**
      * El tipo de asentamiento de la colonia (Colonia, Fraccionamiento, etc.).
@@ -72,7 +75,7 @@ public class Colonia {
      * @param tipoAsentamiento El tipo de asentamiento de la colonia.
      * @param tipo El tipo de la colonia (Rural o Urbano).
      */
-    public Colonia(int codigoPostal, String nombre, String ciudad, TipoAsentamiento tipoAsentamiento, Tipo tipo) {
+    public Colonia(int codigoPostal, String nombre, Ciudad ciudad, TipoAsentamiento tipoAsentamiento, Tipo tipo) {
         this.codigoPostal = codigoPostal;
         this.nombre = nombre;
         this.ciudad = ciudad;
@@ -139,7 +142,7 @@ public class Colonia {
      *
      * @return La ciudad a la que pertenece la colonia.
      */
-    public String getCiudad() {
+    public Ciudad getCiudad() {
         return ciudad;
     }
 
@@ -148,7 +151,7 @@ public class Colonia {
      *
      * @param ciudad La ciudad a establecer.
      */
-    public void setCiudad(String ciudad) {
+    public void setCiudad(Ciudad ciudad) {
         this.ciudad = ciudad;
     }
 
@@ -196,7 +199,7 @@ public class Colonia {
     @Override
     public String toString() {
         return String.format("Colonia{id=%d, codigoPostal=%d, nombre='%s', ciudad='%s', tipoAsentamiento='%s', tipo='%s'}",
-                id, codigoPostal, nombre, ciudad, tipoAsentamiento.getDisplayName(), tipo.getDisplayName());
+                id, codigoPostal, nombre, ciudad.getNombre(), tipoAsentamiento.getDisplayName(), tipo.getDisplayName());
     }
 
     @Override
@@ -219,7 +222,7 @@ public class Colonia {
 }
 
 /**
- * Enum para representar si es Rural o Urbana
+ * Enum para representar si es Rural o Urbana.
  */
 enum Tipo {
     RURAL("Rural"),

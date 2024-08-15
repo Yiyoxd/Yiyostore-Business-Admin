@@ -1,5 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,9 +29,10 @@ public class Categoria {
     private CategoriaEnum nombre;
 
     /**
-     * Productos asociados a esta categoría.
+     * Productos asociados a esta categoría.@JsonBackReference
      */
     @ManyToMany(mappedBy = "categorias")
+    @JsonBackReference
     private Set<Producto> productos = new HashSet<>();
 
     /**

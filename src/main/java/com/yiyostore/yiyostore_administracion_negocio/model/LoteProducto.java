@@ -1,5 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.util.Objects;
 
@@ -27,6 +28,7 @@ public class LoteProducto {
      */
     @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
+    @JsonBackReference
     private Producto producto;
 
     /**

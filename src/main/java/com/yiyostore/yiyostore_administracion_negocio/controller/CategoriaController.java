@@ -14,7 +14,7 @@ import java.util.Optional;
  * categorías.
  */
 @RestController
-@RequestMapping("/categorias")
+@RequestMapping("/api/categorias")
 public class CategoriaController {
 
     private final CategoriaService categoriaService;

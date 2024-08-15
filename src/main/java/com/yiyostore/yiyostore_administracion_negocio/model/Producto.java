@@ -1,5 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class Producto {
      * Lista de lotes asociados al producto.
      */
     @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<LoteProducto> lotes = new ArrayList<>();
 
     /**
@@ -58,6 +60,7 @@ public class Producto {
             joinColumns = @JoinColumn(name = "producto_id"),
             inverseJoinColumns = @JoinColumn(name = "categoria_id")
     )
+    @JsonManagedReference
     private Set<Categoria> categorias = new HashSet<>();
 
     /**

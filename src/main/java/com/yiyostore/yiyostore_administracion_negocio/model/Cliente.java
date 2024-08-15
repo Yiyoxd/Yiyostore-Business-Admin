@@ -43,8 +43,8 @@ public class Cliente {
      * todas las operaciones de persistencia realizadas en el cliente se
      * propagarán a la dirección.
      */
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "direccion_id") // Especifica la columna de la clave foránea
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "direccion_id")
     private Direccion direccion;
 
     /**
@@ -248,3 +248,4 @@ public class Cliente {
         return new Cliente(true);
     }
 }
+ 

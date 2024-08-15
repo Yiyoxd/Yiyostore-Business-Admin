@@ -12,8 +12,8 @@ import java.util.Objects;
 
 /**
  * La clase Direccion representa una dirección física detallada, incluyendo
- * nombre de la calle, número exterior e interior, colonia, ciudad y calles
- * cercanas, junto con detalles adicionales.
+ * nombre de la calle, número exterior e interior, colonia y calles cercanas,
+ * junto con detalles adicionales.
  */
 @Entity
 @Table(name = "direcciones")
@@ -49,14 +49,8 @@ public class Direccion {
      * Colonia o barrio donde se encuentra la dirección.
      */
     @ManyToOne
-    @JoinColumn(name = "colonia_id")
+    @JoinColumn(name = "colonia_id", nullable = false)
     private Colonia colonia;
-
-    /**
-     * Ciudad en la que se encuentra el domicilio.
-     */
-    @Column(name = "ciudad", length = 100, nullable = false)
-    private String ciudad;
 
     /**
      * Primera calle entre la que está ubicada la dirección.
@@ -90,7 +84,6 @@ public class Direccion {
      * @param numeroExterior El número exterior del domicilio.
      * @param numeroInterior El número interior o apartamento (puede ser null).
      * @param colonia La colonia o barrio.
-     * @param ciudad La ciudad en la que se encuentra el domicilio.
      * @param entreCalle1 La primera calle entre la que está ubicada la
      * dirección.
      * @param entreCalle2 La segunda calle entre la que está ubicada la
@@ -98,13 +91,12 @@ public class Direccion {
      * @param referencia Detalles adicionales o referencia de la dirección.
      */
     public Direccion(Long id, String nombreCalle, String numeroExterior, String numeroInterior, Colonia colonia,
-            String ciudad, String entreCalle1, String entreCalle2, String referencia) {
+            String entreCalle1, String entreCalle2, String referencia) {
         this.id = id;
         this.nombreCalle = nombreCalle;
         this.numeroExterior = numeroExterior;
         this.numeroInterior = numeroInterior;
         this.colonia = colonia;
-        this.ciudad = ciudad;
         this.entreCalle1 = entreCalle1;
         this.entreCalle2 = entreCalle2;
         this.referencia = referencia;
@@ -201,24 +193,6 @@ public class Direccion {
     }
 
     /**
-     * Obtiene la ciudad en la que se encuentra el domicilio.
-     *
-     * @return La ciudad en la que se encuentra el domicilio.
-     */
-    public String getCiudad() {
-        return ciudad;
-    }
-
-    /**
-     * Establece la ciudad en la que se encuentra el domicilio.
-     *
-     * @param ciudad La ciudad en la que se encuentra el domicilio.
-     */
-    public void setCiudad(String ciudad) {
-        this.ciudad = ciudad;
-    }
-
-    /**
      * Obtiene la primera calle entre la que está ubicada la dirección.
      *
      * @return La primera calle entre la que está ubicada la dirección.
@@ -281,19 +255,16 @@ public class Direccion {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Direccion{")
-                .append("id=").append(id)
-                .append(", nombreCalle='").append(nombreCalle).append('\'')
-                .append(", numeroExterior='").append(numeroExterior).append('\'')
-                .append(", numeroInterior='").append(numeroInterior).append('\'')
-                .append(", colonia=").append(colonia)
-                .append(", ciudad='").append(ciudad).append('\'')
-                .append(", entreCalle1='").append(entreCalle1).append('\'')
-                .append(", entreCalle2='").append(entreCalle2).append('\'')
-                .append(", referencia='").append(referencia).append('\'')
-                .append('}');
-        return sb.toString();
+        return "Direccion{"
+                + "id=" + id
+                + ", nombreCalle='" + nombreCalle + '\''
+                + ", numeroExterior='" + numeroExterior + '\''
+                + ", numeroInterior='" + numeroInterior + '\''
+                + ", colonia=" + colonia
+                + ", entreCalle1='" + entreCalle1 + '\''
+                + ", entreCalle2='" + entreCalle2 + '\''
+                + ", referencia='" + referencia + '\''
+                + '}';
     }
 
     /**
@@ -312,7 +283,7 @@ public class Direccion {
             return false;
         }
         Direccion direccion = (Direccion) o;
-        return id.equals(direccion.id);
+        return Objects.equals(id, direccion.id);
     }
 
     /**

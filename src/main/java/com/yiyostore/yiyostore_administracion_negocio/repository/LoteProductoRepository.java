@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface LoteProductoRepository extends JpaRepository<LoteProducto, Long> {
-    // Puedes definir métodos personalizados adicionales aquí si es necesario
+
 }
