@@ -5,12 +5,10 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Representa un producto en el inventario. Cada producto puede estar asociado a
- * múltiples lotes. Se eliminó la relación con categorías para simplificar el
- * modelo.  
+ * múltiples lotes.
  */
 @Entity
 @Table(name = "productos")
@@ -204,44 +202,6 @@ public class Producto {
      */
     public boolean removerLote(long idLote) {
         return this.lotes.removeIf(lote -> lote.getId() == idLote);
-    }
-
-    /**
-     * Obtiene la cantidad total disponible del producto sumando las cantidades
-     * de todos los lotes.
-     *
-     * @return La cantidad total disponible del producto.
-     */
-    public int obtenerCantidadTotalDisponible() {
-        return this.lotes.stream().mapToInt(LoteProducto::getCantidad).sum();
-    }
-
-    /**
-     * Encuentra un lote por su identificador.
-     *
-     * @param idLote El identificador del lote a buscar.
-     * @return El lote encontrado, o un Optional vacío si no se encuentra.
-     */
-    public Optional<LoteProducto> encontrarLotePorId(long idLote) {
-        return this.lotes.stream().filter(lote -> lote.getId() == idLote).findFirst();
-    }
-
-    /**
-     * Calcula el costo promedio ponderado del producto basado en los lotes
-     * disponibles.
-     *
-     * @return El costo promedio ponderado del producto.
-     */
-    public double calcularCostoPromedioPonderado() {
-        double costoTotal = 0;
-        int cantidadTotal = 0;
-
-        for (LoteProducto lote : this.lotes) {
-            costoTotal += lote.getCosto() * lote.getCantidad();
-            cantidadTotal += lote.getCantidad();
-        }
-
-        return cantidadTotal > 0 ? costoTotal / cantidadTotal : 0;
     }
 
     /**
