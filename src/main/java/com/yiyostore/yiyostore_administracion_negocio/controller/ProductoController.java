@@ -17,30 +17,40 @@ import java.util.List;
 @RequestMapping("/api/productos")
 public class ProductoController {
 
+    private final ProductoService productoService;
+
+    /**
+     * Constructor que inyecta el servicio de productos.
+     *
+     * @param productoService Servicio para la gestión de productos.
+     */
     @Autowired
-    private ProductoService productoService;
+    public ProductoController(ProductoService productoService) {
+        this.productoService = productoService;
+    }
 
     /**
      * Obtiene todos los productos disponibles en el sistema.
      *
-     * @return Lista de productos.
+     * @return Una lista de objetos {@link Producto}.
      */
     @GetMapping
-    public List<Producto> getAllProductos() {
+    public List<Producto> obtenerTodosLosProductos() {
         return productoService.obtenerTodosLosProductos();
     }
 
     /**
-     * Obtiene un producto por su ID.
+     * Obtiene un producto específico por su ID.
      *
-     * @param id ID del producto a obtener.
-     * @return ResponseEntity con el producto encontrado o un estado 404 si no
-     * se encuentra.
+     * @param id Identificador único del producto a obtener.
+     * @return Un {@link ResponseEntity} con el producto encontrado o un estado
+     * 404 si no se encuentra.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> getProductoById(@PathVariable Long id) {
-        Producto producto = productoService.obtenerProductoPorId(id);
-        return producto != null ? ResponseEntity.ok(producto) : ResponseEntity.notFound().build();
+    public ResponseEntity<Producto> obtenerProductoPorId(@PathVariable Long id) {
+        return productoService.obtenerProductoPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**
@@ -50,34 +60,38 @@ public class ProductoController {
      * @return El producto creado.
      */
     @PostMapping
-    public Producto createProducto(@RequestBody Producto producto) {
+    public Producto crearProducto(@RequestBody Producto producto) {
         return productoService.crearProducto(producto);
     }
 
     /**
-     * Actualiza un producto existente.
+     * Actualiza un producto existente en el sistema.
      *
-     * @param id ID del producto a actualizar.
+     * @param id Identificador único del producto a actualizar.
      * @param producto Nuevos datos del producto.
-     * @return ResponseEntity con el producto actualizado o un estado 404 si no
-     * se encuentra.
+     * @return Un {@link ResponseEntity} con el producto actualizado o un estado
+     * 404 si no se encuentra.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> updateProducto(@PathVariable Long id, @RequestBody Producto producto) {
-        Producto updatedProducto = productoService.actualizarProducto(id, producto);
-        return updatedProducto != null ? ResponseEntity.ok(updatedProducto) : ResponseEntity.notFound().build();
+    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
+        return productoService.actualizarProducto(id, producto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**
      * Elimina un producto por su ID.
      *
-     * @param id ID del producto a eliminar.
-     * @return ResponseEntity con un estado 204 si se elimina o un estado 404 si
-     * no se encuentra.
+     * @param id Identificador único del producto a eliminar.
+     * @return Un {@link ResponseEntity} con un estado 204 si se elimina o un
+     * estado 404 si no se encuentra.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProducto(@PathVariable Long id) {
-        boolean deleted = productoService.eliminarProducto(id);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
+        if (productoService.eliminarProducto(id)) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

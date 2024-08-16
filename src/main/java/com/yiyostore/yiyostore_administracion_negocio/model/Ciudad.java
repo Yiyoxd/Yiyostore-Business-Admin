@@ -26,7 +26,7 @@ public class Ciudad {
     /**
      * Nombre de la ciudad.
      */
-    @Column(name = "nombre", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 50)
     private String nombre;
 
     /**

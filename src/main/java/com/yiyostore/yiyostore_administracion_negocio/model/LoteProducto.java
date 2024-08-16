@@ -2,6 +2,7 @@ package com.yiyostore.yiyostore_administracion_negocio.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -42,21 +43,21 @@ public class LoteProducto {
      * Cantidad disponible de productos en este lote. Este valor representa el
      * inventario actual para este lote específico.
      */
-    @Column(name = "cantidad_disponible")
-    private int cantidadDisponible;
+    @Column(name = "cantidad")
+    private int cantidad;
 
     /**
      * Link de compra para el lote. Este valor es la URL desde donde se puede
      * adquirir el lote.
      */
-    @Column(name = "link_de_compra")
+    @Column(name = "link_de_compra", length = 255)
     private String linkDeCompra;
 
     /**
      * Notas adicionales sobre el lote. Este campo se usa para registrar
      * cualquier información relevante sobre el estado del lote.
      */
-    @Column(name = "notas")
+    @Column(name = "notas", length = 255)
     private String notas;
 
     /**
@@ -67,6 +68,12 @@ public class LoteProducto {
     private Estado estado;
 
     /**
+     * Fecha en la que se adquirió el lote.
+     */
+    @Column(name = "fecha", nullable = false)
+    private LocalDate fecha;
+
+    /**
      * Constructor vacío requerido por JPA.
      */
     public LoteProducto() {
@@ -74,24 +81,24 @@ public class LoteProducto {
 
     /**
      * Constructor completo para inicializar un lote de producto con todos sus
-     * atributos, incluyendo las notas y el estado.
+     * atributos, incluyendo las notas, el estado y la fecha de adquisición.
      *
-     * @param id Identificador único del lote.
      * @param costo Costo del producto en este lote.
-     * @param cantidadDisponible Cantidad disponible de productos en este lote.
+     * @param cantidad Cantidad disponible de productos en este lote.
      * @param producto El producto al que pertenece este lote.
      * @param linkDeCompra Link de compra del lote.
      * @param notas Notas adicionales sobre el estado del lote.
      * @param estado Estado del producto en este lote.
+     * @param fecha Fecha en la que se adquirió el lote.
      */
-    public LoteProducto(Long id, double costo, int cantidadDisponible, Producto producto, String linkDeCompra, String notas, Estado estado) {
-        this.id = id;
+    public LoteProducto(double costo, int cantidad, Producto producto, String linkDeCompra, String notas, Estado estado, LocalDate fecha) {
         this.costo = costo;
-        this.cantidadDisponible = cantidadDisponible;
+        this.cantidad = cantidad;
         this.producto = producto;
         this.linkDeCompra = linkDeCompra;
         this.notas = notas;
         this.estado = estado;
+        this.fecha = fecha;
     }
 
     // Getters y Setters
@@ -154,8 +161,8 @@ public class LoteProducto {
      *
      * @return Cantidad disponible.
      */
-    public int getCantidadDisponible() {
-        return cantidadDisponible;
+    public int getCantidad() {
+        return cantidad;
     }
 
     /**
@@ -163,8 +170,8 @@ public class LoteProducto {
      *
      * @param cantidadDisponible Cantidad disponible.
      */
-    public void setCantidadDisponible(int cantidadDisponible) {
-        this.cantidadDisponible = cantidadDisponible;
+    public void setCantidad(int cantidadDisponible) {
+        this.cantidad = cantidadDisponible;
     }
 
     /**
@@ -222,6 +229,24 @@ public class LoteProducto {
     }
 
     /**
+     * Obtiene la fecha en la que se adquirió el lote.
+     *
+     * @return Fecha de adquisición del lote.
+     */
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    /**
+     * Establece la fecha en la que se adquirió el lote.
+     *
+     * @param fecha Fecha de adquisición del lote.
+     */
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
+    }
+
+    /**
      * Calcula el hashcode del objeto basado en el ID del lote.
      *
      * @return Hashcode del lote.
@@ -262,10 +287,11 @@ public class LoteProducto {
                 .append("id=").append(id)
                 .append(", producto=").append(producto)
                 .append(", costo=").append(costo)
-                .append(", cantidadDisponible=").append(cantidadDisponible)
+                .append(", cantidadDisponible=").append(cantidad)
                 .append(", linkDeCompra='").append(linkDeCompra).append('\'')
                 .append(", notas='").append(notas).append('\'')
                 .append(", estado=").append(estado)
+                .append(", fecha=").append(fecha)
                 .append('}');
         return sb.toString();
     }

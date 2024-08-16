@@ -50,14 +50,14 @@ public class Colonia {
      * El tipo de asentamiento de la colonia (Colonia, Fraccionamiento, etc.).
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_asentamiento", nullable = false, length = 50)
+    @Column(name = "tipo_asentamiento", nullable = false)
     private TipoAsentamiento tipoAsentamiento;
 
     /**
      * El tipo de la colonia (Rural o Urbano).
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", nullable = false, length = 10)
+    @Column(name = "tipo", nullable = false)
     private Tipo tipo;
 
     /**

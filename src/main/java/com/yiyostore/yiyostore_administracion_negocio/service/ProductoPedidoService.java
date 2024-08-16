@@ -1,6 +1,5 @@
 package com.yiyostore.yiyostore_administracion_negocio.service;
 
-
 import com.yiyostore.yiyostore_administracion_negocio.model.ProductoPedido;
 import com.yiyostore.yiyostore_administracion_negocio.repository.ProductoPedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Servicio para manejar la lógica de negocio relacionada con los productos pedidos.
+ * Servicio para manejar la lógica de negocio relacionada con los productos
+ * pedidos.
  */
 @Service
 public class ProductoPedidoService {
@@ -31,7 +31,8 @@ public class ProductoPedidoService {
      * Busca un producto pedido por su ID.
      *
      * @param id Identificador del producto pedido.
-     * @return Un Optional que contiene el producto pedido si se encuentra, de lo contrario vacío.
+     * @return Un Optional que contiene el producto pedido si se encuentra, de
+     * lo contrario vacío.
      */
     public Optional<ProductoPedido> findById(Long id) {
         return productoPedidoRepository.findById(id);

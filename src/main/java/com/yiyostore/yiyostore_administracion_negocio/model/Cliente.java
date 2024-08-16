@@ -15,7 +15,7 @@ public class Cliente {
 
     /**
      * Identificador único del cliente asignado por el sistema. Este valor es
-     * generado automáticamente por la base de datos.
+     * generado automáticamente por el sistema.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,17 +24,10 @@ public class Cliente {
 
     /**
      * Nombre real del cliente. Este campo es opcional y puede ser nulo en caso
-     * de que el cliente no proporcione un nombre.
+     * de que el cliente no proporcione un nombre. Se limita a 100 caracteres.
      */
-    @Column(name = "nombre")
+    @Column(name = "nombre", length = 100)
     private String nombre;
-
-    /**
-     * Nombre del cliente en redes sociales. Este campo es opcional y se utiliza
-     * para almacenar el nombre del cliente en plataformas de redes sociales.
-     */
-    @Column(name = "nombre_en_redes")
-    private String nombreEnRedes;
 
     /**
      * Dirección residencial del cliente. Relación uno a uno con la entidad
@@ -50,17 +43,17 @@ public class Cliente {
     /**
      * Número de teléfono del cliente para llamadas y/o WhatsApp. Este campo es
      * opcional y puede ser nulo si el cliente no proporciona un número de
-     * teléfono. Se realiza una validación del número de teléfono antes de
-     * asignarlo, utilizando la biblioteca libphonenumber.
+     * teléfono. Se limita a 15 caracteres y se valida antes de asignarlo.
      */
-    @Column(name = "numero_telefono")
+    @Column(name = "numero_telefono", length = 20)
     private String numeroTelefono;
 
     /**
      * Notas adicionales sobre el cliente. Este campo es opcional y puede
-     * contener cualquier información adicional relevante sobre el cliente.
+     * contener cualquier información adicional relevante sobre el cliente. Se
+     * limita a 255 caracteres.
      */
-    @Column(name = "notas")
+    @Column(name = "notas", length = 255)
     private String notas;
 
     /**
@@ -77,7 +70,6 @@ public class Cliente {
     public Cliente(boolean esClientePorDefecto) {
         if (esClientePorDefecto) {
             this.nombre = "Cliente Desconocido";
-            this.nombreEnRedes = "NA";
             this.direccion = null;
             this.numeroTelefono = "NA";
             this.notas = "Cliente por defecto para ventas a desconocidos.";
@@ -119,24 +111,6 @@ public class Cliente {
      */
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    /**
-     * Obtiene el nombre del cliente en redes sociales.
-     *
-     * @return el nombre en redes del cliente.
-     */
-    public String getNombreEnRedes() {
-        return nombreEnRedes;
-    }
-
-    /**
-     * Establece el nombre del cliente en redes sociales.
-     *
-     * @param nombreEnRedes el nuevo nombre en redes del cliente.
-     */
-    public void setNombreEnRedes(String nombreEnRedes) {
-        this.nombreEnRedes = nombreEnRedes;
     }
 
     /**
@@ -207,8 +181,8 @@ public class Cliente {
      */
     @Override
     public String toString() {
-        return String.format("Cliente {ID=%d, Nombre='%s', Nombre en Redes='%s', Dirección=%s, Número de Teléfono='%s', Notas='%s'}",
-                id, nombre, nombreEnRedes, direccion, numeroTelefono, notas);
+        return String.format("Cliente {ID=%d, Nombre='%s', Dirección=%s, Número de Teléfono='%s', Notas='%s'}",
+                id, nombre, direccion, numeroTelefono, notas);
     }
 
     /**
@@ -248,4 +222,3 @@ public class Cliente {
         return new Cliente(true);
     }
 }
- 

@@ -4,7 +4,7 @@ import com.yiyostore.yiyostore_administracion_negocio.model.Cliente;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ClienteTest {
+public class TelefonoTest {
 
     @Test
     public void testSetNumeroTelefonoValido() {

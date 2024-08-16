@@ -7,43 +7,53 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Servicio para gestionar las operaciones relacionadas con los productos en la
- * aplicación.
+ * Servicio para la gestión de productos. Proporciona operaciones CRUD y lógica
+ * adicional para la manipulación de objetos {@link Producto}.
  */
 @Service
 public class ProductoService {
 
-    @Autowired
-    private ProductoRepository productoRepository;
+    private final ProductoRepository productoRepository;
 
     /**
-     * Obtiene todos los productos almacenados en el repositorio.
+     * Constructor que inyecta el repositorio de productos.
      *
-     * @return Lista de todos los productos.
+     * @param productoRepository Repositorio para la manipulación de datos de
+     * productos.
      */
-    @Transactional(readOnly = true)
+    @Autowired
+    public ProductoService(ProductoRepository productoRepository) {
+        this.productoRepository = productoRepository;
+    }
+
+    /**
+     * Obtiene una lista de todos los productos disponibles.
+     *
+     * @return Lista de objetos {@link Producto}.
+     */
     public List<Producto> obtenerTodosLosProductos() {
         return productoRepository.findAll();
     }
 
     /**
-     * Obtiene un producto específico por su ID.
+     * Busca un producto por su identificador único.
      *
-     * @param id ID del producto a buscar.
-     * @return El producto si se encuentra, o null si no existe.
+     * @param id Identificador único del producto.
+     * @return Un {@link Optional} que contiene el producto si se encuentra, o
+     * vacío si no.
      */
-    @Transactional(readOnly = true)
-    public Producto obtenerProductoPorId(Long id) {
-        return productoRepository.findById(id).orElse(null);
+    public Optional<Producto> obtenerProductoPorId(Long id) {
+        return productoRepository.findById(id);
     }
 
     /**
-     * Crea un nuevo producto en el repositorio.
+     * Guarda un nuevo producto en la base de datos.
      *
-     * @param producto Datos del producto a crear.
-     * @return El producto creado.
+     * @param producto El objeto {@link Producto} a guardar.
+     * @return El producto guardado con su ID generado.
      */
     @Transactional
     public Producto crearProducto(Producto producto) {
@@ -51,35 +61,61 @@ public class ProductoService {
     }
 
     /**
-     * Actualiza un producto existente en el repositorio.
+     * Actualiza un producto existente en la base de datos.
      *
-     * @param id ID del producto a actualizar.
-     * @param producto Nuevos datos del producto.
-     * @return El producto actualizado, o null si no existe.
+     * @param id Identificador único del producto a actualizar.
+     * @param updatedProducto El objeto {@link Producto} con los nuevos valores.
+     * @return El producto actualizado, envuelto en un {@link Optional}.
      */
     @Transactional
-    public Producto actualizarProducto(Long id, Producto producto) {
-        if (productoRepository.existsById(id)) {
-            producto.setId(id);
-            return productoRepository.save(producto);
-        } else {
-            return null;
-        }
+    public Optional<Producto> actualizarProducto(Long id, Producto updatedProducto) {
+        return productoRepository.findById(id).map(existingProducto -> {
+            existingProducto.setNombre(updatedProducto.getNombre());
+            existingProducto.setDescripcion(updatedProducto.getDescripcion());
+            existingProducto.setPrecio(updatedProducto.getPrecio());
+            existingProducto.setLotes(updatedProducto.getLotes());
+            existingProducto.setFechaDeAdicion(updatedProducto.getFechaDeAdicion());
+            return productoRepository.save(existingProducto);
+        });
     }
 
     /**
-     * Elimina un producto específico por su ID.
+     * Elimina un producto de la base de datos por su identificador único.
      *
-     * @param id ID del producto a eliminar.
-     * @return true si el producto se eliminó, false si no se encontró.
+     * @param id Identificador único del producto a eliminar.
      */
     @Transactional
     public boolean eliminarProducto(Long id) {
         if (productoRepository.existsById(id)) {
             productoRepository.deleteById(id);
             return true;
-        } else {
-            return false;
         }
+        return false;
+    }
+
+    /**
+     * Calcula la cantidad total disponible de un producto sumando las
+     * cantidades de todos sus lotes.
+     *
+     * @param idProducto Identificador único del producto.
+     * @return La cantidad total disponible del producto.
+     */
+    public int obtenerCantidadTotalDisponible(Long idProducto) {
+        return productoRepository.findById(idProducto)
+                .map(Producto::obtenerCantidadTotalDisponible)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + idProducto));
+    }
+
+    /**
+     * Calcula el costo promedio ponderado del producto basado en los lotes
+     * disponibles.
+     *
+     * @param idProducto Identificador único del producto.
+     * @return El costo promedio ponderado del producto.
+     */
+    public double calcularCostoPromedioPonderado(Long idProducto) {
+        return productoRepository.findById(idProducto)
+                .map(Producto::calcularCostoPromedioPonderado)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + idProducto));
     }
 }

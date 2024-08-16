@@ -1,12 +1,10 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * Representa una categoría a la que pueden pertenecer los productos.
+ * Representa una categoría a la que pueden pertenecer los productos. Se eliminó
+ * la relación con productos para simplificar el modelo.
  */
 @Entity
 @Table(name = "categorias")
@@ -27,13 +25,6 @@ public class Categoria {
     @Column(name = "nombre", nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
     private CategoriaEnum nombre;
-
-    /**
-     * Productos asociados a esta categoría.@JsonBackReference
-     */
-    @ManyToMany(mappedBy = "categorias")
-    @JsonBackReference
-    private Set<Producto> productos = new HashSet<>();
 
     /**
      * Constructor vacío requerido por JPA.
@@ -87,28 +78,44 @@ public class Categoria {
     }
 
     /**
-     * Obtiene los productos asociados a esta categoría.
+     * Devuelve una representación en forma de cadena de esta categoría.
      *
-     * @return El conjunto de productos asociados.
+     * @return Una cadena que representa la categoría.
      */
-    public Set<Producto> getProductos() {
-        return productos;
-    }
-
-    /**
-     * Establece los productos asociados a esta categoría.
-     *
-     * @param productos El nuevo conjunto de productos asociados.
-     */
-    public void setProductos(Set<Producto> productos) {
-        this.productos = productos;
-    }
-
     @Override
     public String toString() {
         return "Categoria{"
                 + "id=" + id
                 + ", nombre=" + nombre
                 + '}';
+    }
+
+    /**
+     * Compara esta categoría con otro objeto para verificar si son iguales.
+     *
+     * @param o El objeto a comparar.
+     * @return true si los objetos son iguales (misma id), false en caso
+     * contrario.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Categoria categoria = (Categoria) o;
+        return id != null ? id.equals(categoria.id) : categoria.id == null;
+    }
+
+    /**
+     * Genera un código hash para esta categoría basado en su identificador.
+     *
+     * @return El código hash generado.
+     */
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 }

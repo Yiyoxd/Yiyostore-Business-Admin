@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Representa un producto en el inventario. Cada producto puede estar asociado a
- * múltiples lotes y categorías.
+ * múltiples lotes. Se eliminó la relación con categorías para simplificar el
+ * modelo.  
  */
 @Entity
 @Table(name = "productos")
@@ -35,7 +34,7 @@ public class Producto {
     /**
      * Descripción detallada del producto.
      */
-    @Column(name = "descripcion")
+    @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 
     /**
@@ -47,21 +46,9 @@ public class Producto {
     /**
      * Lista de lotes asociados al producto.
      */
-    @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "producto")
     @JsonManagedReference
     private List<LoteProducto> lotes = new ArrayList<>();
-
-    /**
-     * Categorías a las que pertenece el producto.
-     */
-    @ManyToMany
-    @JoinTable(
-            name = "producto_categoria",
-            joinColumns = @JoinColumn(name = "producto_id"),
-            inverseJoinColumns = @JoinColumn(name = "categoria_id")
-    )
-    @JsonManagedReference
-    private Set<Categoria> categorias = new HashSet<>();
 
     /**
      * Fecha en que el producto fue añadido al inventario.
@@ -82,15 +69,13 @@ public class Producto {
      * @param descripcion Descripción detallada del producto.
      * @param precio Precio de venta del producto.
      * @param lotes Lista de lotes del producto.
-     * @param categorias Categorías del producto.
      * @param fechaDeAdicion Fecha en que el producto fue añadido al inventario.
      */
-    public Producto(String nombre, String descripcion, double precio, List<LoteProducto> lotes, Set<Categoria> categorias, LocalDate fechaDeAdicion) {
+    public Producto(String nombre, String descripcion, double precio, List<LoteProducto> lotes, LocalDate fechaDeAdicion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
         this.lotes = lotes != null ? lotes : new ArrayList<>();
-        this.categorias = categorias != null ? categorias : new HashSet<>();
         this.fechaDeAdicion = fechaDeAdicion;
     }
 
@@ -185,24 +170,6 @@ public class Producto {
     }
 
     /**
-     * Obtiene las categorías a las que pertenece el producto.
-     *
-     * @return El conjunto de categorías asociadas al producto.
-     */
-    public Set<Categoria> getCategorias() {
-        return categorias;
-    }
-
-    /**
-     * Establece las categorías a las que pertenece el producto.
-     *
-     * @param categorias El nuevo conjunto de categorías asociadas al producto.
-     */
-    public void setCategorias(Set<Categoria> categorias) {
-        this.categorias = categorias;
-    }
-
-    /**
      * Obtiene la fecha en que el producto fue añadido al inventario.
      *
      * @return La fecha de adición del producto.
@@ -246,7 +213,7 @@ public class Producto {
      * @return La cantidad total disponible del producto.
      */
     public int obtenerCantidadTotalDisponible() {
-        return this.lotes.stream().mapToInt(LoteProducto::getCantidadDisponible).sum();
+        return this.lotes.stream().mapToInt(LoteProducto::getCantidad).sum();
     }
 
     /**
@@ -270,8 +237,8 @@ public class Producto {
         int cantidadTotal = 0;
 
         for (LoteProducto lote : this.lotes) {
-            costoTotal += lote.getCosto() * lote.getCantidadDisponible();
-            cantidadTotal += lote.getCantidadDisponible();
+            costoTotal += lote.getCosto() * lote.getCantidad();
+            cantidadTotal += lote.getCantidad();
         }
 
         return cantidadTotal > 0 ? costoTotal / cantidadTotal : 0;
@@ -320,7 +287,6 @@ public class Producto {
                 .append(",\n  descripcion='").append(descripcion).append('\'')
                 .append(",\n  precio=").append(precio)
                 .append(",\n  lotes=").append(lotes)
-                .append(",\n  categorias=").append(categorias)
                 .append(",\n  fechaDeAdicion=").append(fechaDeAdicion)
                 .append("\n}");
         return sb.toString();
