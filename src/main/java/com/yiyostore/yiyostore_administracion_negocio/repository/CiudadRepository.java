@@ -9,5 +9,4 @@ import org.springframework.stereotype.Repository;
  * permite la implementación de consultas personalizadas.
  */
 @Repository
-public interface CiudadRepository extends JpaRepository<Ciudad, Long> {
-}
+public interface CiudadRepository extends JpaRepository<Ciudad, Long> {}

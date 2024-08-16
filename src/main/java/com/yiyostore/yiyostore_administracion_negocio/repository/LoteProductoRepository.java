@@ -10,6 +10,4 @@ import org.springframework.stereotype.Repository;
  * y soporte de paginación y clasificación.
  */
 @Repository
-public interface LoteProductoRepository extends JpaRepository<LoteProducto, Long> {
-
-}
+public interface LoteProductoRepository extends JpaRepository<LoteProducto, Long> {}

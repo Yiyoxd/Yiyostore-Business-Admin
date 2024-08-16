@@ -10,6 +10,4 @@ import org.springframework.stereotype.Repository;
  * soporte de paginación y clasificación.
  */
 @Repository
-public interface PedidoRepository extends JpaRepository<Pedido, Long> {
-    // Puedes definir métodos personalizados adicionales aquí si es necesario
-}
+public interface PedidoRepository extends JpaRepository<Pedido, Long> {}

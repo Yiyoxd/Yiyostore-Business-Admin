@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository;
  * Repositorio para la entidad Categoria.
  */
 @Repository
-public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
-}
+public interface CategoriaRepository extends JpaRepository<Categoria, Long> {}

@@ -9,5 +9,4 @@ import org.springframework.stereotype.Repository;
  * Repositorio para manejar las operaciones CRUD de la entidad ProductoPedido.
  */
 @Repository
-public interface ProductoPedidoRepository extends JpaRepository<ProductoPedido, Long> {
-}
+public interface ProductoPedidoRepository extends JpaRepository<ProductoPedido, Long> {}
