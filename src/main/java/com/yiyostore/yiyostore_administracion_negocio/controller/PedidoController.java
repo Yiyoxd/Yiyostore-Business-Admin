@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controlador REST para manejar las operaciones relacionadas con los pedidos.
@@ -15,8 +16,12 @@ import java.util.List;
 @RequestMapping("/api/pedidos")
 public class PedidoController {
 
+    private final PedidoService pedidoService;
+
     @Autowired
-    private PedidoService pedidoService;
+    public PedidoController(PedidoService pedidoService) {
+        this.pedidoService = pedidoService;
+    }
 
     /**
      * Obtiene la lista de todos los pedidos.
@@ -37,8 +42,9 @@ public class PedidoController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Pedido> getPedidoById(@PathVariable Long id) {
-        Pedido pedido = pedidoService.obtenerPedidoPorId(id);
-        return pedido != null ? ResponseEntity.ok(pedido) : ResponseEntity.notFound().build();
+        Optional<Pedido> pedidoOptional = pedidoService.obtenerPedidoPorId(id);
+        return pedidoOptional.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -50,20 +56,6 @@ public class PedidoController {
     @PostMapping
     public Pedido createPedido(@RequestBody Pedido pedido) {
         return pedidoService.crearPedido(pedido);
-    }
-
-    /**
-     * Actualiza un pedido existente.
-     *
-     * @param id ID del pedido a actualizar.
-     * @param pedido Nuevos datos del pedido.
-     * @return Respuesta con el pedido actualizado o un estado 404 si no se
-     * encuentra.
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<Pedido> updatePedido(@PathVariable Long id, @RequestBody Pedido pedido) {
-        Pedido updatedPedido = pedidoService.actualizarPedido(id, pedido);
-        return updatedPedido != null ? ResponseEntity.ok(updatedPedido) : ResponseEntity.notFound().build();
     }
 
     /**

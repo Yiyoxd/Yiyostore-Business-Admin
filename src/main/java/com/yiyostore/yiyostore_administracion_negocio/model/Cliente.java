@@ -1,5 +1,7 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import com.yiyostore.yiyostore_administracion_negocio.utils.ValidarNumero;
 import jakarta.persistence.*;
@@ -7,11 +9,12 @@ import jakarta.persistence.*;
 /**
  * Representa un cliente en el sistema. Esta clase incluye todos los detalles
  * necesarios para administrar la relación con el cliente, como identificación,
- * información de contacto, y otros detalles relevantes.
+ * información de contacto, y otros detalles relevantes. Un cliente puede tener
+ * múltiples pedidos asociados.
  */
 @Entity
 @Table(name = "clientes")
-public class Cliente {
+public class Cliente implements Serializable {
 
     /**
      * Identificador único del cliente asignado por el sistema. Este valor es
@@ -19,33 +22,34 @@ public class Cliente {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
     /**
      * Nombre real del cliente. Este campo es opcional y puede ser nulo en caso
      * de que el cliente no proporcione un nombre. Se limita a 100 caracteres.
      */
-    @Column(name = "nombre", length = 100)
+    @Column(name = "nombre", length = 100, nullable = true)
     private String nombre;
 
     /**
      * Dirección residencial del cliente. Relación uno a uno con la entidad
-     * {@link Direccion}. Esta relación permite que cada cliente tenga una única
-     * dirección asociada. La dirección se carga de manera perezosa (lazy) y
-     * todas las operaciones de persistencia realizadas en el cliente se
-     * propagarán a la dirección.
+     * {@link Direccion}. Este campo es opcional y puede ser nulo si el cliente
+     * no proporciona una dirección. La dirección se carga de manera perezosa
+     * (lazy) y todas las operaciones de persistencia realizadas en el cliente
+     * se propagarán a la dirección. Si la dirección es eliminada del cliente,
+     * también se eliminará de la base de datos (orphanRemoval = true).
      */
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "direccion_id")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "direccion_id", nullable = true)
     private Direccion direccion;
 
     /**
      * Número de teléfono del cliente para llamadas y/o WhatsApp. Este campo es
      * opcional y puede ser nulo si el cliente no proporciona un número de
-     * teléfono. Se limita a 15 caracteres y se valida antes de asignarlo.
+     * teléfono. Se limita a 20 caracteres y se valida antes de asignarlo.
      */
-    @Column(name = "numero_telefono", length = 20)
+    @Column(name = "numero_telefono", length = 20, nullable = true)
     private String numeroTelefono;
 
     /**
@@ -53,8 +57,15 @@ public class Cliente {
      * contener cualquier información adicional relevante sobre el cliente. Se
      * limita a 255 caracteres.
      */
-    @Column(name = "notas", length = 255)
+    @Column(name = "notas", length = 255, nullable = true)
     private String notas;
+
+    /**
+     * Relación uno a muchos con la entidad {@link Pedido}. Un cliente puede
+     * tener múltiples pedidos.
+     */
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Pedido> pedidos;
 
     /**
      * Constructor vacío necesario para JPA.
@@ -63,17 +74,18 @@ public class Cliente {
     }
 
     /**
-     * Constructor para cliente por defecto.
+     * Constructor completo para inicializar un cliente con todos sus atributos.
      *
-     * @param esClientePorDefecto {@code true} si es un cliente por defecto.
+     * @param nombre el nombre del cliente.
+     * @param direccion la dirección del cliente.
+     * @param numeroTelefono el número de teléfono del cliente.
+     * @param notas notas adicionales sobre el cliente.
      */
-    public Cliente(boolean esClientePorDefecto) {
-        if (esClientePorDefecto) {
-            this.nombre = "Cliente Desconocido";
-            this.direccion = null;
-            this.numeroTelefono = "NA";
-            this.notas = "Cliente por defecto para ventas a desconocidos.";
-        }
+    public Cliente(String nombre, Direccion direccion, String numeroTelefono, String notas) {
+        this.nombre = nombre;
+        this.direccion = direccion;
+        setNumeroTelefono(numeroTelefono);
+        this.notas = notas;
     }
 
     /**
@@ -105,7 +117,7 @@ public class Cliente {
     }
 
     /**
-     * Establece el nombre real del cliente.
+     * Establece el nombre del cliente.
      *
      * @param nombre el nuevo nombre del cliente.
      */
@@ -123,11 +135,17 @@ public class Cliente {
     }
 
     /**
-     * Establece la dirección residencial del cliente.
+     * Establece la dirección residencial del cliente. Si la dirección es nula,
+     * se lanza una excepción para prevenir la inconsistencia. Además, si la
+     * relación es bidireccional, se asegura de que la dirección tenga una
+     * referencia de vuelta a este cliente.
      *
      * @param direccion la nueva dirección del cliente.
      */
     public void setDireccion(Direccion direccion) {
+        if (direccion != null) {
+            direccion.setCliente(this);
+        }
         this.direccion = direccion;
     }
 
@@ -174,6 +192,34 @@ public class Cliente {
     }
 
     /**
+     * Obtiene la lista de pedidos asociados a este cliente.
+     *
+     * @return la lista de pedidos del cliente.
+     */
+    public List<Pedido> getPedidos() {
+        return pedidos;
+    }
+
+    /**
+     * Establece la lista de pedidos asociados a este cliente.
+     *
+     * @param pedidos la nueva lista de pedidos del cliente.
+     */
+    public void setPedidos(List<Pedido> pedidos) {
+        this.pedidos = pedidos;
+    }
+
+    /**
+     * Agrega un pedido a la lista de pedidos del cliente.
+     *
+     * @param pedido Pedido a agregar.
+     */
+    public void agregarPedido(Pedido pedido) {
+        pedido.setCliente(this);
+        this.pedidos.add(pedido);
+    }
+
+    /**
      * Retorna una representación en forma de cadena de la instancia actual del
      * cliente.
      *
@@ -211,14 +257,5 @@ public class Cliente {
     @Override
     public int hashCode() {
         return Objects.hash(id, nombre, numeroTelefono);
-    }
-
-    /**
-     * Crea y devuelve una instancia de cliente por defecto.
-     *
-     * @return una instancia de cliente por defecto.
-     */
-    public static Cliente crearClientePorDefecto() {
-        return new Cliente(true);
     }
 }

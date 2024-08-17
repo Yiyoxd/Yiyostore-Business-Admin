@@ -36,14 +36,14 @@ public class LoteProducto {
      * Costo del producto en este lote. Este valor puede ser diferente entre
      * lotes, incluso para el mismo producto.
      */
-    @Column(name = "costo")
+    @Column(name = "costo", nullable = false)
     private double costo;
 
     /**
      * Cantidad disponible de productos en este lote. Este valor representa el
      * inventario actual para este lote específico.
      */
-    @Column(name = "cantidad")
+    @Column(name = "cantidad", nullable = false)
     private int cantidad;
 
     /**
@@ -92,8 +92,8 @@ public class LoteProducto {
      * @param fecha Fecha en la que se adquirió el lote.
      */
     public LoteProducto(double costo, int cantidad, Producto producto, String linkDeCompra, String notas, Estado estado, LocalDate fecha) {
-        this.costo = costo;
-        this.cantidad = cantidad;
+        this.setCosto(costo);
+        this.setCantidad(cantidad);
         this.producto = producto;
         this.linkDeCompra = linkDeCompra;
         this.notas = notas;
@@ -101,7 +101,6 @@ public class LoteProducto {
         this.fecha = fecha;
     }
 
-    // Getters y Setters
     /**
      * Obtiene el identificador único del lote.
      *
@@ -148,11 +147,16 @@ public class LoteProducto {
     }
 
     /**
-     * Establece el costo del producto en este lote.
+     * Establece el costo del producto en este lote. El costo no puede ser
+     * negativo.
      *
      * @param costo Costo del producto.
+     * @throws IllegalArgumentException si el costo es negativo.
      */
     public void setCosto(double costo) {
+        if (costo < 0) {
+            throw new IllegalArgumentException("El costo no puede ser negativo");
+        }
         this.costo = costo;
     }
 
@@ -166,12 +170,17 @@ public class LoteProducto {
     }
 
     /**
-     * Establece la cantidad disponible de productos en este lote.
+     * Establece la cantidad disponible de productos en este lote. La cantidad
+     * no puede ser negativa.
      *
-     * @param cantidadDisponible Cantidad disponible.
+     * @param cantidad Cantidad disponible.
+     * @throws IllegalArgumentException si la cantidad es negativa.
      */
-    public void setCantidad(int cantidadDisponible) {
-        this.cantidad = cantidadDisponible;
+    public void setCantidad(int cantidad) {
+        if (cantidad < 0) {
+            throw new IllegalArgumentException("La cantidad no puede ser negativa");
+        }
+        this.cantidad = cantidad;
     }
 
     /**

@@ -61,7 +61,9 @@ public class ProductoService {
     }
 
     /**
-     * Actualiza un producto existente en la base de datos.
+     * Actualiza un producto existente en la base de datos. Este método recibe
+     * el ID del producto a actualizar, carga el producto desde la base de
+     * datos, y aplica las actualizaciones necesarias.
      *
      * @param id Identificador único del producto a actualizar.
      * @param updatedProducto El objeto {@link Producto} con los nuevos valores.
@@ -80,9 +82,12 @@ public class ProductoService {
     }
 
     /**
-     * Elimina un producto de la base de datos por su identificador único.
+     * Elimina un producto de la base de datos por su identificador único. Este
+     * método solo requiere el ID del producto y no necesita cargar el objeto
+     * completo, lo que lo hace más eficiente.
      *
      * @param id Identificador único del producto a eliminar.
+     * @return true si el producto fue eliminado, false si no se encontró.
      */
     @Transactional
     public boolean eliminarProducto(Long id) {
@@ -95,20 +100,23 @@ public class ProductoService {
 
     /**
      * Calcula la cantidad total disponible de un producto sumando las
-     * cantidades de todos sus lotes.
+     * cantidades de todos sus lotes. Este método utiliza el objeto
+     * {@link Producto} completo para realizar la operación, lo que es eficiente
+     * si el producto ya está cargado en memoria.
      *
      * @param idProducto Identificador único del producto.
      * @return La cantidad total disponible del producto.
      */
     public int obtenerCantidadTotalDisponible(Long idProducto) {
         return productoRepository.findById(idProducto)
-                .map(Producto::obtenerCantidadTotalDisponible)
+                .map(Producto::calcularCantidadTotal)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + idProducto));
     }
 
     /**
      * Calcula el costo promedio ponderado del producto basado en los lotes
-     * disponibles.
+     * disponibles. Este método utiliza el objeto {@link Producto} completo para
+     * realizar el cálculo del costo.
      *
      * @param idProducto Identificador único del producto.
      * @return El costo promedio ponderado del producto.

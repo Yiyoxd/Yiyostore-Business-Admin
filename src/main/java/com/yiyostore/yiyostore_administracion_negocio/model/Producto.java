@@ -36,15 +36,16 @@ public class Producto {
     private String descripcion;
 
     /**
-     * Precio de venta del producto.
+     * Precio de venta del producto. Debe ser un valor positivo.
      */
     @Column(name = "precio", nullable = false)
     private double precio;
 
     /**
-     * Lista de lotes asociados al producto.
+     * Lista de lotes asociados al producto. Cada lote está relacionado con un
+     * producto a través de la relación bidireccional.
      */
-    @OneToMany(mappedBy = "producto")
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<LoteProducto> lotes = new ArrayList<>();
 
@@ -72,7 +73,7 @@ public class Producto {
     public Producto(String nombre, String descripcion, double precio, List<LoteProducto> lotes, LocalDate fechaDeAdicion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.precio = precio;
+        this.setPrecio(precio);
         this.lotes = lotes != null ? lotes : new ArrayList<>();
         this.fechaDeAdicion = fechaDeAdicion;
     }
@@ -141,11 +142,16 @@ public class Producto {
     }
 
     /**
-     * Establece el precio de venta del producto.
+     * Establece el precio de venta del producto. El precio no puede ser
+     * negativo.
      *
      * @param precio El nuevo precio de venta del producto.
+     * @throws IllegalArgumentException si el precio es negativo.
      */
     public void setPrecio(double precio) {
+        if (precio < 0) {
+            throw new IllegalArgumentException("El precio no puede ser negativo");
+        }
         this.precio = precio;
     }
 
@@ -191,7 +197,10 @@ public class Producto {
      * @param lote El lote a agregar.
      */
     public void agregarLote(LoteProducto lote) {
-        this.lotes.add(lote);
+        if (lote != null && !this.lotes.contains(lote)) {
+            lote.setProducto(this);
+            this.lotes.add(lote);
+        }
     }
 
     /**
@@ -202,6 +211,36 @@ public class Producto {
      */
     public boolean removerLote(long idLote) {
         return this.lotes.removeIf(lote -> lote.getId() == idLote);
+    }
+
+    /**
+     * Calcula la cantidad total disponible del producto sumando las cantidades
+     * de todos sus lotes.
+     *
+     * @return La cantidad total disponible del producto.
+     */
+    public int calcularCantidadTotal() {
+        return this.lotes.stream()
+                .mapToInt(LoteProducto::getCantidad)
+                .sum();
+    }
+
+    /**
+     * Calcula el costo promedio ponderado del producto basado en los lotes
+     * disponibles.
+     *
+     * @return El costo promedio ponderado del producto.
+     */
+    public double calcularCostoPromedioPonderado() {
+        double costoTotal = 0;
+        int cantidadTotal = 0;
+
+        for (LoteProducto lote : this.lotes) {
+            costoTotal += lote.getCosto() * lote.getCantidad();
+            cantidadTotal += lote.getCantidad();
+        }
+
+        return cantidadTotal > 0 ? costoTotal / cantidadTotal : 0.0;
     }
 
     /**

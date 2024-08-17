@@ -4,12 +4,12 @@ import com.yiyostore.yiyostore_administracion_negocio.model.Pedido;
 import com.yiyostore.yiyostore_administracion_negocio.repository.PedidoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Servicio que proporciona operaciones CRUD para la entidad Pedido.
+ * Servicio que proporciona operaciones CRUD para la entidad Pedido y maneja la
+ * lógica de procesamiento de pedidos.
  */
 @Service
 public class PedidoService {
@@ -17,7 +17,7 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
 
     @Autowired
-    public PedidoService(PedidoRepository pedidoRepository) {
+    public PedidoService(PedidoRepository pedidoRepository, InventarioService inventarioService) {
         this.pedidoRepository = pedidoRepository;
     }
 
@@ -34,11 +34,11 @@ public class PedidoService {
      * Obtiene un pedido por su ID.
      *
      * @param id ID del pedido.
-     * @return El pedido encontrado o null si no existe.
+     * @return Un Optional que contiene el pedido si se encuentra, o un Optional
+     * vacío si no.
      */
-    public Pedido obtenerPedidoPorId(Long id) {
-        Optional<Pedido> pedido = pedidoRepository.findById(id);
-        return pedido.orElse(null);
+    public Optional<Pedido> obtenerPedidoPorId(Long id) {
+        return pedidoRepository.findById(id);
     }
 
     /**
@@ -48,23 +48,7 @@ public class PedidoService {
      * @return El pedido creado.
      */
     public Pedido crearPedido(Pedido pedido) {
-        return pedidoRepository.save(pedido);
-    }
-
-    /**
-     * Actualiza un pedido existente.
-     *
-     * @param id ID del pedido a actualizar.
-     * @param pedido Detalles actualizados del pedido.
-     * @return El pedido actualizado.
-     */
-    public Pedido actualizarPedido(Long id, Pedido pedido) {
-        if (pedidoRepository.existsById(id)) {
-            pedido.setId(id);
-            return pedidoRepository.save(pedido);
-        } else {
-            return null;
-        }
+        return guardarPedido(pedido);
     }
 
     /**
@@ -79,5 +63,15 @@ public class PedidoService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Guarda un pedido en el repositorio.
+     *
+     * @param pedido El pedido a guardar.
+     * @return El pedido guardado.
+     */
+    private Pedido guardarPedido(Pedido pedido) {
+        return pedidoRepository.save(pedido);
     }
 }

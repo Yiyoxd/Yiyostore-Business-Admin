@@ -1,26 +1,21 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 import java.util.Objects;
 
 /**
- * La clase Direccion representa una dirección física detallada, incluyendo
- * nombre de la calle, número exterior e interior, colonia y calles cercanas,
- * junto con detalles adicionales.
+ * La clase Direccion representa una dirección física detallada. Incluye
+ * información como el nombre de la calle, número exterior e interior, colonia y
+ * calles cercanas, así como detalles adicionales. Una dirección puede estar
+ * asociada a un cliente.
  */
 @Entity
 @Table(name = "direcciones")
 public class Direccion {
 
     /**
-     * Identificador único de la dirección.
+     * Identificador único de la dirección, generado automáticamente por la base
+     * de datos.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,47 +23,60 @@ public class Direccion {
     private Long id;
 
     /**
-     * Nombre de la calle.
+     * Nombre de la calle. Este campo es opcional y puede ser nulo si la calle
+     * no tiene nombre.
      */
-    @Column(name = "nombre_calle", length = 100)
+    @Column(name = "nombre_calle", length = 100, nullable = true)
     private String nombreCalle;
 
     /**
-     * Número exterior del domicilio.
+     * Número exterior del domicilio. Este campo es opcional y puede ser nulo si
+     * no hay número exterior.
      */
-    @Column(name = "numero_exterior", length = 10)
+    @Column(name = "numero_exterior", length = 10, nullable = true)
     private String numeroExterior;
 
     /**
      * Número interior o apartamento. Puede ser nulo si no aplica.
      */
-    @Column(name = "numero_interior", length = 10)
+    @Column(name = "numero_interior", length = 10, nullable = true)
     private String numeroInterior;
 
     /**
-     * Colonia o barrio donde se encuentra la dirección.
+     * Colonia o barrio donde se encuentra la dirección. Este campo es
+     * obligatorio.
      */
     @ManyToOne
     @JoinColumn(name = "colonia_id", nullable = false)
     private Colonia colonia;
 
     /**
-     * Primera calle entre la que está ubicada la dirección.
+     * Primera calle entre la que está ubicada la dirección. Este campo es
+     * opcional.
      */
-    @Column(name = "entre_calle_1", length = 100)
+    @Column(name = "entre_calle_1", length = 100, nullable = true)
     private String entreCalle1;
 
     /**
-     * Segunda calle entre la que está ubicada la dirección.
+     * Segunda calle entre la que está ubicada la dirección. Este campo es
+     * opcional.
      */
-    @Column(name = "entre_calle_2", length = 100)
+    @Column(name = "entre_calle_2", length = 100, nullable = true)
     private String entreCalle2;
 
     /**
-     * Detalles adicionales o referencia de la dirección.
+     * Detalles adicionales o referencia de la dirección. Este campo es
+     * opcional.
      */
-    @Column(name = "referencia", length = 255)
+    @Column(name = "referencia", length = 255, nullable = true)
     private String referencia;
+
+    /**
+     * Cliente asociado a esta dirección. Relación uno a uno con la entidad
+     * Cliente. Esta relación es bidireccional.
+     */
+    @OneToOne(mappedBy = "direccion")
+    private Cliente cliente;
 
     /**
      * Constructor por defecto necesario para JPA.
@@ -79,20 +87,19 @@ public class Direccion {
     /**
      * Constructor para inicializar una dirección con todos sus atributos.
      *
-     * @param id El identificador único de la dirección.
-     * @param nombreCalle El nombre de la calle.
-     * @param numeroExterior El número exterior del domicilio.
+     * @param nombreCalle El nombre de la calle (puede ser null).
+     * @param numeroExterior El número exterior del domicilio (puede ser null).
      * @param numeroInterior El número interior o apartamento (puede ser null).
-     * @param colonia La colonia o barrio.
+     * @param colonia La colonia o barrio (no puede ser null).
      * @param entreCalle1 La primera calle entre la que está ubicada la
-     * dirección.
+     * dirección (puede ser null).
      * @param entreCalle2 La segunda calle entre la que está ubicada la
-     * dirección.
-     * @param referencia Detalles adicionales o referencia de la dirección.
+     * dirección (puede ser null).
+     * @param referencia Detalles adicionales o referencia de la dirección
+     * (puede ser null).
      */
-    public Direccion(Long id, String nombreCalle, String numeroExterior, String numeroInterior, Colonia colonia,
+    public Direccion(String nombreCalle, String numeroExterior, String numeroInterior, Colonia colonia,
             String entreCalle1, String entreCalle2, String referencia) {
-        this.id = id;
         this.nombreCalle = nombreCalle;
         this.numeroExterior = numeroExterior;
         this.numeroInterior = numeroInterior;
@@ -123,7 +130,7 @@ public class Direccion {
     /**
      * Obtiene el nombre de la calle.
      *
-     * @return El nombre de la calle.
+     * @return El nombre de la calle, o null si no tiene nombre.
      */
     public String getNombreCalle() {
         return nombreCalle;
@@ -132,7 +139,7 @@ public class Direccion {
     /**
      * Establece el nombre de la calle.
      *
-     * @param nombreCalle El nombre de la calle.
+     * @param nombreCalle El nombre de la calle (puede ser null).
      */
     public void setNombreCalle(String nombreCalle) {
         this.nombreCalle = nombreCalle;
@@ -141,7 +148,8 @@ public class Direccion {
     /**
      * Obtiene el número exterior del domicilio.
      *
-     * @return El número exterior del domicilio.
+     * @return El número exterior del domicilio, o null si no tiene número
+     * exterior.
      */
     public String getNumeroExterior() {
         return numeroExterior;
@@ -150,7 +158,7 @@ public class Direccion {
     /**
      * Establece el número exterior del domicilio.
      *
-     * @param numeroExterior El número exterior del domicilio.
+     * @param numeroExterior El número exterior del domicilio (puede ser null).
      */
     public void setNumeroExterior(String numeroExterior) {
         this.numeroExterior = numeroExterior;
@@ -159,7 +167,7 @@ public class Direccion {
     /**
      * Obtiene el número interior del domicilio.
      *
-     * @return El número interior del domicilio.
+     * @return El número interior del domicilio, o null si no aplica.
      */
     public String getNumeroInterior() {
         return numeroInterior;
@@ -168,7 +176,7 @@ public class Direccion {
     /**
      * Establece el número interior del domicilio.
      *
-     * @param numeroInterior El número interior del domicilio.
+     * @param numeroInterior El número interior del domicilio (puede ser null).
      */
     public void setNumeroInterior(String numeroInterior) {
         this.numeroInterior = numeroInterior;
@@ -186,16 +194,20 @@ public class Direccion {
     /**
      * Establece la colonia o barrio donde se encuentra la dirección.
      *
-     * @param colonia La colonia o barrio.
+     * @param colonia La colonia o barrio (no puede ser null).
      */
     public void setColonia(Colonia colonia) {
+        if (colonia == null) {
+            throw new IllegalArgumentException("La colonia no puede ser nula");
+        }
         this.colonia = colonia;
     }
 
     /**
      * Obtiene la primera calle entre la que está ubicada la dirección.
      *
-     * @return La primera calle entre la que está ubicada la dirección.
+     * @return La primera calle entre la que está ubicada la dirección, o null
+     * si no aplica.
      */
     public String getEntreCalle1() {
         return entreCalle1;
@@ -205,7 +217,7 @@ public class Direccion {
      * Establece la primera calle entre la que está ubicada la dirección.
      *
      * @param entreCalle1 La primera calle entre la que está ubicada la
-     * dirección.
+     * dirección (puede ser null).
      */
     public void setEntreCalle1(String entreCalle1) {
         this.entreCalle1 = entreCalle1;
@@ -214,7 +226,8 @@ public class Direccion {
     /**
      * Obtiene la segunda calle entre la que está ubicada la dirección.
      *
-     * @return La segunda calle entre la que está ubicada la dirección.
+     * @return La segunda calle entre la que está ubicada la dirección, o null
+     * si no aplica.
      */
     public String getEntreCalle2() {
         return entreCalle2;
@@ -224,7 +237,7 @@ public class Direccion {
      * Establece la segunda calle entre la que está ubicada la dirección.
      *
      * @param entreCalle2 La segunda calle entre la que está ubicada la
-     * dirección.
+     * dirección (puede ser null).
      */
     public void setEntreCalle2(String entreCalle2) {
         this.entreCalle2 = entreCalle2;
@@ -233,7 +246,8 @@ public class Direccion {
     /**
      * Obtiene los detalles adicionales o referencia de la dirección.
      *
-     * @return Los detalles adicionales o referencia de la dirección.
+     * @return Los detalles adicionales o referencia de la dirección, o null si
+     * no aplica.
      */
     public String getReferencia() {
         return referencia;
@@ -242,10 +256,30 @@ public class Direccion {
     /**
      * Establece los detalles adicionales o referencia de la dirección.
      *
-     * @param referencia Los detalles adicionales o referencia de la dirección.
+     * @param referencia Los detalles adicionales o referencia de la dirección
+     * (puede ser null).
      */
     public void setReferencia(String referencia) {
         this.referencia = referencia;
+    }
+
+    /**
+     * Obtiene el cliente asociado a esta dirección.
+     *
+     * @return El cliente asociado a esta dirección, o null si no hay cliente
+     * asociado.
+     */
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    /**
+     * Establece el cliente asociado a esta dirección.
+     *
+     * @param cliente El cliente asociado a esta dirección.
+     */
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
     /**
@@ -255,16 +289,19 @@ public class Direccion {
      */
     @Override
     public String toString() {
-        return "Direccion{"
-                + "id=" + id
-                + ", nombreCalle='" + nombreCalle + '\''
-                + ", numeroExterior='" + numeroExterior + '\''
-                + ", numeroInterior='" + numeroInterior + '\''
-                + ", colonia=" + colonia
-                + ", entreCalle1='" + entreCalle1 + '\''
-                + ", entreCalle2='" + entreCalle2 + '\''
-                + ", referencia='" + referencia + '\''
-                + '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("Direccion{")
+                .append("id=").append(id)
+                .append(", nombreCalle='").append(nombreCalle != null ? nombreCalle : "N/A").append('\'')
+                .append(", numeroExterior='").append(numeroExterior != null ? numeroExterior : "N/A").append('\'')
+                .append(", numeroInterior='").append(numeroInterior != null ? numeroInterior : "N/A").append('\'')
+                .append(", colonia=").append(colonia != null ? colonia.getNombre() : "N/A")
+                .append(", entreCalle1='").append(entreCalle1 != null ? entreCalle1 : "N/A").append('\'')
+                .append(", entreCalle2='").append(entreCalle2 != null ? entreCalle2 : "N/A").append('\'')
+                .append(", referencia='").append(referencia != null ? referencia : "N/A").append('\'')
+                .append(", clienteId=").append(cliente != null ? cliente.getId() : "N/A")
+                .append('}');
+        return sb.toString();
     }
 
     /**

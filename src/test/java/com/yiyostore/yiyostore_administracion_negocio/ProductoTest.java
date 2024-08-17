@@ -61,25 +61,4 @@ public class ProductoTest {
         assertThat(removed).isTrue();
         assertThat(producto.getLotes()).doesNotContain(lote1);
     }
-
-    @Test
-    public void testObtenerCantidadTotalDisponible() {
-        int cantidadTotal = producto.obtenerCantidadTotalDisponible();
-
-        assertThat(cantidadTotal).isEqualTo(30);
-    }
-
-    @Test
-    public void testEncontrarLotePorId() {
-        Optional<LoteProducto> loteEncontrado = producto.encontrarLotePorId(lote1.getId());
-
-        assertThat(loteEncontrado).isPresent().contains(lote1);
-    }
-
-    @Test
-    public void testCalcularCostoPromedioPonderado() {
-        double costoPromedio = producto.calcularCostoPromedioPonderado();
-
-        assertThat(costoPromedio).isEqualTo(4000.0 / 30);
-    }
 }

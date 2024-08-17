@@ -5,8 +5,6 @@ import com.yiyostore.yiyostore_administracion_negocio.model.LoteProducto;
 import com.yiyostore.yiyostore_administracion_negocio.model.Producto;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -18,7 +16,4 @@ import org.springframework.stereotype.Repository;
 public interface LoteProductoRepository extends JpaRepository<LoteProducto, Long> {
 
     List<LoteProducto> findByProductoAndEstadoInOrderByFechaAsc(Producto producto, List<Estado> estados);
-    
-    @Query("SELECT SUM(l.cantidad) FROM LoteProducto l WHERE l.producto = :producto AND l.estado IN :estados")
-    int sumCantidadByProductoAndEstadoIn(@Param("producto") Producto producto, @Param("estados") List<Estado> estados);
 }

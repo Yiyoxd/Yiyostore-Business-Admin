@@ -1,121 +1,95 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
+import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * Representa un pedido realizado por un cliente. Incluye información sobre el
- * cliente, los productos pedidos, la fecha del pedido, la fecha de entrega, el
- * estado del pedido, el método de pago, el lugar de compra y el total del
- * pedido.
+ * Entidad que representa un pedido realizado por un cliente. Un pedido puede
+ * contener múltiples detalles de pedido, cada uno asociado a un producto y un
+ * lote específico.
  */
 @Entity
 @Table(name = "pedidos")
 public class Pedido {
 
     /**
-     * Identificador único del pedido.
+     * Identificador único del pedido. Auto-generado por la base de datos.
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
     /**
-     * El cliente que realizó el pedido.
+     * Cliente que realizó el pedido.
      */
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
     /**
-     * Lista de productos que forman parte del pedido.
-     */
-    @OneToMany(mappedBy = "pedido")
-    private List<ProductoPedido> productos;
-
-    /**
      * Fecha en la que se realizó el pedido.
      */
-    @Column(name = "fecha_pedido")
-    private LocalDate fechaPedido;
+    @Column(name = "fecha", nullable = false)
+    private LocalDate fecha;
 
     /**
-     * Fecha prevista para la entrega del pedido.
+     * Lista de detalles del pedido. Cada detalle representa un producto y un
+     * lote específico que se incluyó en el pedido.
      */
-    @Column(name = "fecha_entrega")
-    private LocalDate fechaEntrega;
-
-    /**
-     * Estado actual del pedido.
-     */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "estado")
-    private Estado estado;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetallePedido> detalles = new ArrayList<>();
 
     /**
      * Método de pago utilizado para este pedido.
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "metodo_pago")
+    @Column(name = "metodo_pago", nullable = false)
     private MetodoPago metodoPago;
 
     /**
-     * Lugar donde se realizó la compra del pedido.
+     * Lugar donde se realizó la compra.
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "lugar_compra")
+    @Column(name = "lugar_compra", nullable = false)
     private LugarCompra lugarCompra;
 
     /**
-     * Total del pedido.
+     * Notas adicionales sobre el pedido. Este campo permite almacenar
+     * información relevante o comentarios acerca del pedido.
      */
-    @Column(name = "total")
-    private double total;
+    @Column(name = "notas", length = 500)
+    private String notas;
 
     /**
-     * Constructor vacío requerido por JPA.
-     */
-    public Pedido() {
-    }
-
-    /**
-     * Constructor para inicializar un pedido con todos sus atributos.
+     * Constructor completo para inicializar un pedido con todos sus atributos.
      *
-     * @param cliente El cliente que realizó el pedido.
-     * @param productos La lista de productos pedidos.
-     * @param fechaPedido La fecha en que se realizó el pedido.
-     * @param fechaEntrega La fecha en que se entregará el pedido.
-     * @param estado El estado del pedido.
-     * @param metodoPago El método de pago utilizado.
-     * @param lugarCompra El lugar donde se realizó la compra.
-     * @param total El total del pedido.
+     * @param cliente Cliente que realizó el pedido.
+     * @param fecha Fecha en la que se realizó el pedido.
+     * @param detalles Lista de detalles del pedido.
+     * @param metodoPago Método de pago utilizado.
+     * @param lugarCompra Lugar donde se realizó la compra.
+     * @param notas Notas adicionales sobre el pedido.
      */
-    public Pedido(Cliente cliente, List<ProductoPedido> productos, LocalDate fechaPedido, LocalDate fechaEntrega, Estado estado, MetodoPago metodoPago, LugarCompra lugarCompra, double total) {
-        this.cliente = cliente;
-        this.productos = productos;
-        this.fechaPedido = fechaPedido;
-        this.fechaEntrega = fechaEntrega;
-        this.estado = estado;
+    public Pedido(Cliente cliente, LocalDate fecha, List<DetallePedido> detalles, MetodoPago metodoPago, LugarCompra lugarCompra, String notas) {
+        if (cliente == null) {
+            throw new IllegalArgumentException("El cliente no puede ser nulo.");
+        }
+        setCliente(cliente);
+        this.fecha = fecha;
+        this.detalles = detalles != null ? detalles : new ArrayList<>();
         this.metodoPago = metodoPago;
         this.lugarCompra = lugarCompra;
-        this.total = total;
+        this.notas = notas;
     }
 
-    // Getters y Setters
     /**
      * Obtiene el identificador único del pedido.
      *
-     * @return El identificador del pedido.
+     * @return ID del pedido.
      */
     public Long getId() {
         return id;
@@ -124,7 +98,7 @@ public class Pedido {
     /**
      * Establece el identificador único del pedido.
      *
-     * @param id El nuevo identificador del pedido.
+     * @param id ID del pedido.
      */
     public void setId(Long id) {
         this.id = id;
@@ -133,97 +107,68 @@ public class Pedido {
     /**
      * Obtiene el cliente que realizó el pedido.
      *
-     * @return El cliente del pedido.
+     * @return Cliente del pedido.
      */
     public Cliente getCliente() {
         return cliente;
     }
 
     /**
-     * Establece el cliente que realizó el pedido.
+     * Establece el cliente que realizó el pedido y asegura que la relación
+     * bidireccional se mantenga.
      *
-     * @param cliente El nuevo cliente del pedido.
+     * @param cliente Cliente del pedido.
      */
     public void setCliente(Cliente cliente) {
+        if (cliente == null) {
+            throw new IllegalArgumentException("El cliente no puede ser nulo.");
+        }
         this.cliente = cliente;
+        if (!cliente.getPedidos().contains(this)) {
+            cliente.getPedidos().add(this);
+        }
     }
 
     /**
-     * Obtiene la lista de productos pedidos.
+     * Obtiene la fecha en la que se realizó el pedido.
      *
-     * @return La lista de productos pedidos.
+     * @return Fecha del pedido.
      */
-    public List<ProductoPedido> getProductos() {
-        return productos;
+    public LocalDate getFecha() {
+        return fecha;
     }
 
     /**
-     * Establece la lista de productos pedidos.
+     * Establece la fecha en la que se realizó el pedido.
      *
-     * @param productos La nueva lista de productos pedidos.
+     * @param fecha Fecha del pedido.
      */
-    public void setProductos(List<ProductoPedido> productos) {
-        this.productos = productos;
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
     }
 
     /**
-     * Obtiene la fecha en que se realizó el pedido.
+     * Obtiene la lista de detalles del pedido.
      *
-     * @return La fecha del pedido.
+     * @return Lista de detalles del pedido.
      */
-    public LocalDate getFechaPedido() {
-        return fechaPedido;
+    public List<DetallePedido> getDetalles() {
+        return detalles;
     }
 
     /**
-     * Establece la fecha en que se realizó el pedido.
+     * Establece la lista de detalles del pedido.
      *
-     * @param fechaPedido La nueva fecha del pedido.
+     * @param detalles Lista de detalles del pedido.
      */
-    public void setFechaPedido(LocalDate fechaPedido) {
-        this.fechaPedido = fechaPedido;
-    }
-
-    /**
-     * Obtiene la fecha en que se entregará el pedido.
-     *
-     * @return La fecha de entrega del pedido.
-     */
-    public LocalDate getFechaEntrega() {
-        return fechaEntrega;
-    }
-
-    /**
-     * Establece la fecha en que se entregará el pedido.
-     *
-     * @param fechaEntrega La nueva fecha de entrega del pedido.
-     */
-    public void setFechaEntrega(LocalDate fechaEntrega) {
-        this.fechaEntrega = fechaEntrega;
-    }
-
-    /**
-     * Obtiene el estado actual del pedido.
-     *
-     * @return El estado del pedido.
-     */
-    public Estado getEstado() {
-        return estado;
-    }
-
-    /**
-     * Establece el estado actual del pedido.
-     *
-     * @param estado El nuevo estado del pedido.
-     */
-    public void setEstado(Estado estado) {
-        this.estado = estado;
+    public void setDetalles(List<DetallePedido> detalles) {
+        this.detalles = detalles;
     }
 
     /**
      * Obtiene el método de pago utilizado para el pedido.
      *
-     * @return El método de pago del pedido.
+     * @return Método de pago.
      */
     public MetodoPago getMetodoPago() {
         return metodoPago;
@@ -232,95 +177,117 @@ public class Pedido {
     /**
      * Establece el método de pago utilizado para el pedido.
      *
-     * @param metodoPago El nuevo método de pago del pedido.
+     * @param metodoPago Método de pago.
      */
     public void setMetodoPago(MetodoPago metodoPago) {
         this.metodoPago = metodoPago;
     }
 
     /**
-     * Obtiene el lugar donde se realizó la compra del pedido.
+     * Obtiene el lugar donde se realizó la compra.
      *
-     * @return El lugar de compra del pedido.
+     * @return Lugar de compra.
      */
     public LugarCompra getLugarCompra() {
         return lugarCompra;
     }
 
     /**
-     * Establece el lugar donde se realizó la compra del pedido.
+     * Establece el lugar donde se realizó la compra.
      *
-     * @param lugarCompra El nuevo lugar de compra del pedido.
+     * @param lugarCompra Lugar de compra.
      */
     public void setLugarCompra(LugarCompra lugarCompra) {
         this.lugarCompra = lugarCompra;
     }
 
     /**
-     * Obtiene el total del pedido.
+     * Obtiene las notas adicionales sobre el pedido.
+     *
+     * @return Notas adicionales del pedido.
+     */
+    public String getNotas() {
+        return notas;
+    }
+
+    /**
+     * Establece las notas adicionales sobre el pedido.
+     *
+     * @param notas Notas adicionales del pedido.
+     */
+    public void setNotas(String notas) {
+        this.notas = notas;
+    }
+
+    /**
+     * Agrega un detalle a la lista de detalles del pedido.
+     *
+     * @param detalle Detalle a agregar.
+     */
+    public void agregarDetalle(DetallePedido detalle) {
+        if (detalle != null && !this.detalles.contains(detalle)) {
+            detalle.setPedido(this);
+            this.detalles.add(detalle);
+        }
+    }
+
+    /**
+     * Calcula el total del pedido sumando los subtotales de cada detalle.
      *
      * @return El total del pedido.
      */
-    public double getTotal() {
-        return total;
+    public double calcularTotal() {
+        return this.detalles.stream()
+                .mapToDouble(detalle -> detalle.getCantidad() * detalle.getPrecioUnitario())
+                .sum();
     }
 
     /**
-     * Establece el total del pedido.
+     * Calcula el hashcode del objeto basado en el ID del pedido.
      *
-     * @param total El nuevo total del pedido.
+     * @return Hashcode del pedido.
      */
-    public void setTotal(double total) {
-        this.total = total;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     /**
-     * Devuelve una representación en forma de cadena del pedido.
+     * Compara este objeto con otro para determinar si son iguales.
      *
-     * @return Una cadena que representa el pedido.
+     * @param obj Objeto con el cual comparar.
+     * @return true si los objetos son iguales (misma id), false en caso
+     * contrario.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Pedido that = (Pedido) obj;
+        return Objects.equals(id, that.id);
+    }
+
+    /**
+     * Representación en cadena del objeto Pedido.
+     *
+     * @return Cadena que representa el objeto.
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Pedido {")
-                .append("\n  ID=").append(id)
-                .append(",\n  Cliente=").append(cliente)
-                .append(",\n  Productos=").append(productos)
-                .append(",\n  Fecha de Pedido=").append(fechaPedido)
-                .append(",\n  Fecha de Entrega=").append(fechaEntrega)
-                .append(",\n  Estado=").append(estado)
-                .append(",\n  Método de Pago=").append(metodoPago)
-                .append(",\n  Lugar de Compra=").append(lugarCompra)
-                .append(",\n  Total=").append(total)
-                .append("\n}");
+        sb.append("Pedido{")
+                .append("id=").append(id)
+                .append(", cliente=").append(cliente)
+                .append(", fecha=").append(fecha)
+                .append(", metodoPago=").append(metodoPago)
+                .append(", lugarCompra=").append(lugarCompra)
+                .append(", detalles=").append(detalles)
+                .append(", notas='").append(notas).append('\'')
+                .append('}');
         return sb.toString();
-    }
-
-    /**
-     * Compara este objeto Pedido con otro para verificar si son iguales.
-     *
-     * @param o El objeto a comparar.
-     * @return true si los objetos son iguales, false en caso contrario.
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Pedido pedido = (Pedido) o;
-        return id.equals(pedido.id);
-    }
-
-    /**
-     * Calcula el código hash de este objeto Pedido.
-     *
-     * @return El código hash del pedido.
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, cliente, total);
     }
 }

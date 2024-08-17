@@ -5,6 +5,7 @@ import com.yiyostore.yiyostore_administracion_negocio.model.Producto;
 import com.yiyostore.yiyostore_administracion_negocio.exception.InsufficientStockException;
 import com.yiyostore.yiyostore_administracion_negocio.model.Estado;
 import com.yiyostore.yiyostore_administracion_negocio.repository.LoteProductoRepository;
+import com.yiyostore.yiyostore_administracion_negocio.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,9 @@ import java.util.Arrays;
 public class InventarioService {
 
     @Autowired
+    private ProductoRepository productoRepository;
+
+    @Autowired
     private LoteProductoRepository loteProductoRepository;
 
     /**
@@ -35,9 +39,7 @@ public class InventarioService {
             return false;
         }
 
-        int cantidadTotalDisponible = loteProductoRepository.sumCantidadByProductoAndEstadoIn(
-                producto, Arrays.asList(Estado.NUEVO, Estado.REACONDICIONADO)
-        );
+        int cantidadTotalDisponible = producto.calcularCantidadTotal();
         return cantidadTotalDisponible >= cantidadSolicitada;
     }
 
@@ -68,6 +70,44 @@ public class InventarioService {
 
         if (cantidadSolicitada > 0) {
             throw new InsufficientStockException("No se pudo cubrir la cantidad solicitada con el stock disponible.");
+        }
+    }
+
+    /**
+     * Devuelve la cantidad especificada de un producto al inventario.
+     *
+     * @param producto El producto a devolver.
+     * @param cantidad La cantidad a devolver.
+     */
+    @Transactional
+    public void devolverProducto(Producto producto, int cantidad) {
+        if (producto == null || cantidad <= 0) {
+            throw new IllegalArgumentException("Producto no puede ser nulo y la cantidad debe ser mayor que cero.");
+        }
+
+        List<LoteProducto> lotes = loteProductoRepository.findByProductoAndEstadoInOrderByFechaAsc(
+                producto, Arrays.asList(Estado.NUEVO, Estado.REACONDICIONADO)
+        );
+
+        for (LoteProducto lote : lotes) {
+            if (cantidad <= 0) {
+                break;
+            }
+
+            int cantidadRestanteEnLote = lote.getCantidad();
+            int cantidadADevolver = Math.min(cantidad, cantidadRestanteEnLote);
+
+            // Incrementar la cantidad en el lote actual
+            lote.setCantidad(cantidadRestanteEnLote + cantidadADevolver);
+            loteProductoRepository.save(lote);
+
+            cantidad -= cantidadADevolver;
+        }
+
+        if (cantidad > 0) {
+            // Si hay cantidad restante que no se pudo devolver a un lote existente,
+            // podrías manejar este caso creando un nuevo lote o ajustando algún registro adicional
+            throw new IllegalStateException("No se pudo devolver toda la cantidad solicitada al inventario.");
         }
     }
 
@@ -109,26 +149,22 @@ public class InventarioService {
     }
 
     /**
-     * Calcula el costo promedio ponderado del producto basado en los lotes
-     * disponibles.
+     * Calcula el costo total del inventario sumando el costo de todos los lotes
+     * de todos los productos en el inventario.
      *
-     * @param producto El producto para el cual se calcula el costo promedio
-     * ponderado.
-     * @return El costo promedio ponderado del producto.
+     * @return El costo total del inventario.
      */
-    public double calcularCostoPromedioPonderado(Producto producto) {
-        if (producto == null || producto.getLotes().isEmpty()) {
-            return 0.0;
+    public double calcularCostoTotalInventario() {
+        double costoTotalInventario = 0.0;
+
+        List<Producto> productos = productoRepository.findAll();
+
+        for (Producto producto : productos) {
+            for (LoteProducto lote : producto.getLotes()) {
+                costoTotalInventario += lote.getCosto() * lote.getCantidad();
+            }
         }
 
-        double costoTotal = 0;
-        int cantidadTotal = 0;
-
-        for (LoteProducto lote : producto.getLotes()) {
-            costoTotal += lote.getCosto() * lote.getCantidad();
-            cantidadTotal += lote.getCantidad();
-        }
-
-        return cantidadTotal > 0 ? costoTotal / cantidadTotal : 0.0;
+        return costoTotalInventario;
     }
 }
