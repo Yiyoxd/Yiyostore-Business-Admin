@@ -14,24 +14,16 @@ public enum EstadoPedido {
      * PENDIENTE: El pedido ha sido creado pero aún no se ha procesado.
      *
      * Este es el estado inicial de un pedido recién creado. El pedido está
-     * esperando para ser procesado.
+     * esperando para ser enviado.
      */
     PENDIENTE,
     /**
      * EN_PROCESO: El pedido está siendo procesado.
      *
-     * En este estado, el pedido ha comenzado a ser preparado, ya sea por la
-     * recolección de los productos en el inventario o la preparación para el
-     * envío.
+     * En este estado, el pedido está en proceso de entrega.
      */
     EN_PROCESO,
-    /**
-     * DESPACHADO: El pedido ha sido despachado y está en camino.
-     *
-     * Este estado indica que el pedido ha sido enviado al cliente y se
-     * encuentra en tránsito hacia su destino.
-     */
-    DESPACHADO,
+
     /**
      * COMPLETADO: El pedido ha sido entregado y completado.
      *

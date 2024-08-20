@@ -1,10 +1,12 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
-import java.io.Serializable;
+import com.yiyostore.yiyostore_administracion_negocio.exception.NumeroTelefonoInvalidoException;
+import com.yiyostore.yiyostore_administracion_negocio.utils.TelefonoUtils;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import com.yiyostore.yiyostore_administracion_negocio.utils.ValidarNumero;
-import jakarta.persistence.*;
 
 /**
  * Representa un cliente en el sistema. Esta clase incluye todos los detalles
@@ -14,7 +16,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "clientes")
-public class Cliente implements Serializable {
+public class Cliente {
 
     /**
      * Identificador único del cliente asignado por el sistema. Este valor es
@@ -40,7 +42,7 @@ public class Cliente implements Serializable {
      * se propagarán a la dirección. Si la dirección es eliminada del cliente,
      * también se eliminará de la base de datos (orphanRemoval = true).
      */
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "direccion_id", nullable = true)
     private Direccion direccion;
 
@@ -64,8 +66,8 @@ public class Cliente implements Serializable {
      * Relación uno a muchos con la entidad {@link Pedido}. Un cliente puede
      * tener múltiples pedidos.
      */
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Pedido> pedidos;
+    @OneToMany(mappedBy = "cliente")
+    private List<Pedido> pedidos = new ArrayList<>();
 
     /**
      * Constructor vacío necesario para JPA.
@@ -135,17 +137,11 @@ public class Cliente implements Serializable {
     }
 
     /**
-     * Establece la dirección residencial del cliente. Si la dirección es nula,
-     * se lanza una excepción para prevenir la inconsistencia. Además, si la
-     * relación es bidireccional, se asegura de que la dirección tenga una
-     * referencia de vuelta a este cliente.
+     * Establece la dirección residencial del cliente.
      *
      * @param direccion la nueva dirección del cliente.
      */
     public void setDireccion(Direccion direccion) {
-        if (direccion != null) {
-            direccion.setCliente(this);
-        }
         this.direccion = direccion;
     }
 
@@ -164,13 +160,13 @@ public class Cliente implements Serializable {
      * de teléfono antes de asignarlo.
      *
      * @param numeroTelefono el nuevo número de teléfono del cliente.
-     * @throws IllegalArgumentException si el número de teléfono no es válido.
+     * @throws NumeroTelefonoInvalidoException si el número de teléfono no es
+     * válido.
      */
     public void setNumeroTelefono(String numeroTelefono) {
-        if (numeroTelefono != null && !ValidarNumero.esValido(numeroTelefono)) {
-            throw new IllegalArgumentException("Número de teléfono inválido");
+        if (numeroTelefono != null) {
+            this.numeroTelefono = TelefonoUtils.normalizar(numeroTelefono);
         }
-        this.numeroTelefono = numeroTelefono;
     }
 
     /**
@@ -201,18 +197,10 @@ public class Cliente implements Serializable {
     }
 
     /**
-     * Establece la lista de pedidos asociados a este cliente.
+     * Agrega un pedido a la lista de pedidos del cliente. Mantiene la relación
+     * bidireccional entre cliente y pedido.
      *
-     * @param pedidos la nueva lista de pedidos del cliente.
-     */
-    public void setPedidos(List<Pedido> pedidos) {
-        this.pedidos = pedidos;
-    }
-
-    /**
-     * Agrega un pedido a la lista de pedidos del cliente.
-     *
-     * @param pedido Pedido a agregar.
+     * @param pedido el pedido a agregar.
      */
     public void agregarPedido(Pedido pedido) {
         pedido.setCliente(this);

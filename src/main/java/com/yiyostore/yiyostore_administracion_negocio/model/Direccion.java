@@ -1,16 +1,18 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+
 import java.util.Objects;
 
 /**
  * La clase Direccion representa una dirección física detallada. Incluye
- * información como el nombre de la calle, número exterior e interior, colonia y
- * calles cercanas, así como detalles adicionales. Una dirección puede estar
- * asociada a un cliente.
+ * información como el nombre de la calle, número exterior e interior, colonia,
+ * calles cercanas y detalles adicionales.
  */
 @Entity
 @Table(name = "direcciones")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Direccion {
 
     /**
@@ -46,7 +48,7 @@ public class Direccion {
      * Colonia o barrio donde se encuentra la dirección. Este campo es
      * obligatorio.
      */
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "colonia_id", nullable = false)
     private Colonia colonia;
 
@@ -70,13 +72,6 @@ public class Direccion {
      */
     @Column(name = "referencia", length = 255, nullable = true)
     private String referencia;
-
-    /**
-     * Cliente asociado a esta dirección. Relación uno a uno con la entidad
-     * Cliente. Esta relación es bidireccional.
-     */
-    @OneToOne(mappedBy = "direccion")
-    private Cliente cliente;
 
     /**
      * Constructor por defecto necesario para JPA.
@@ -103,7 +98,7 @@ public class Direccion {
         this.nombreCalle = nombreCalle;
         this.numeroExterior = numeroExterior;
         this.numeroInterior = numeroInterior;
-        this.colonia = colonia;
+        setColonia(colonia); // Validación interna
         this.entreCalle1 = entreCalle1;
         this.entreCalle2 = entreCalle2;
         this.referencia = referencia;
@@ -195,6 +190,7 @@ public class Direccion {
      * Establece la colonia o barrio donde se encuentra la dirección.
      *
      * @param colonia La colonia o barrio (no puede ser null).
+     * @throws IllegalArgumentException si la colonia es null.
      */
     public void setColonia(Colonia colonia) {
         if (colonia == null) {
@@ -264,44 +260,17 @@ public class Direccion {
     }
 
     /**
-     * Obtiene el cliente asociado a esta dirección.
-     *
-     * @return El cliente asociado a esta dirección, o null si no hay cliente
-     * asociado.
-     */
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    /**
-     * Establece el cliente asociado a esta dirección.
-     *
-     * @param cliente El cliente asociado a esta dirección.
-     */
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
-
-    /**
      * Devuelve una representación en forma de cadena de la dirección.
      *
      * @return Una cadena que representa la dirección.
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Direccion{")
-                .append("id=").append(id)
-                .append(", nombreCalle='").append(nombreCalle != null ? nombreCalle : "N/A").append('\'')
-                .append(", numeroExterior='").append(numeroExterior != null ? numeroExterior : "N/A").append('\'')
-                .append(", numeroInterior='").append(numeroInterior != null ? numeroInterior : "N/A").append('\'')
-                .append(", colonia=").append(colonia != null ? colonia.getNombre() : "N/A")
-                .append(", entreCalle1='").append(entreCalle1 != null ? entreCalle1 : "N/A").append('\'')
-                .append(", entreCalle2='").append(entreCalle2 != null ? entreCalle2 : "N/A").append('\'')
-                .append(", referencia='").append(referencia != null ? referencia : "N/A").append('\'')
-                .append(", clienteId=").append(cliente != null ? cliente.getId() : "N/A")
-                .append('}');
-        return sb.toString();
+        return String.format("Direccion{id=%d, nombreCalle='%s', numeroExterior='%s', numeroInterior='%s', colonia='%s', entreCalle1='%s', entreCalle2='%s', referencia='%s'}",
+                id, nombreCalle != null ? nombreCalle : "N/A", numeroExterior != null ? numeroExterior : "N/A",
+                numeroInterior != null ? numeroInterior : "N/A", colonia != null ? colonia.getNombre() : "N/A",
+                entreCalle1 != null ? entreCalle1 : "N/A", entreCalle2 != null ? entreCalle2 : "N/A",
+                referencia != null ? referencia : "N/A");
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,6 +44,7 @@ public class Colonia {
      * La ciudad a la que pertenece la colonia.
      */
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "ciudad_id", nullable = false)
     private Ciudad ciudad;
 

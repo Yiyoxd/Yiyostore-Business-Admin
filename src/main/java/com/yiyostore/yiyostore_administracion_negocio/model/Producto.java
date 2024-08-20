@@ -67,14 +67,12 @@ public class Producto {
      * @param nombre Nombre del producto.
      * @param descripcion Descripción detallada del producto.
      * @param precio Precio de venta del producto.
-     * @param lotes Lista de lotes del producto.
      * @param fechaDeAdicion Fecha en que el producto fue añadido al inventario.
      */
-    public Producto(String nombre, String descripcion, double precio, List<LoteProducto> lotes, LocalDate fechaDeAdicion) {
+    public Producto(String nombre, String descripcion, double precio, LocalDate fechaDeAdicion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.setPrecio(precio);
-        this.lotes = lotes != null ? lotes : new ArrayList<>();
         this.fechaDeAdicion = fechaDeAdicion;
     }
 
@@ -165,15 +163,6 @@ public class Producto {
     }
 
     /**
-     * Establece la lista de lotes asociados al producto.
-     *
-     * @param lotes La nueva lista de lotes asociados al producto.
-     */
-    public void setLotes(List<LoteProducto> lotes) {
-        this.lotes = lotes;
-    }
-
-    /**
      * Obtiene la fecha en que el producto fue añadido al inventario.
      *
      * @return La fecha de adición del producto.
@@ -195,10 +184,18 @@ public class Producto {
      * Agrega un lote a la lista de lotes del producto.
      *
      * @param lote El lote a agregar.
+     * @throws IllegalArgumentException si el lote ya pertenece a otro producto.
      */
     public void agregarLote(LoteProducto lote) {
-        if (lote != null && !this.lotes.contains(lote)) {
-            lote.setProducto(this);
+        if (lote == null) {
+            throw new IllegalArgumentException("El lote no puede ser nulo");
+        }
+
+        if (lote.getProducto() != null && !lote.getProducto().equals(this)) {
+            throw new IllegalArgumentException("El lote ya pertenece a otro producto");
+        }
+
+        if (!this.lotes.contains(lote)) {
             this.lotes.add(lote);
         }
     }
@@ -279,15 +276,8 @@ public class Producto {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Producto {")
-                .append("\n  id=").append(id)
-                .append(",\n  nombre='").append(nombre).append('\'')
-                .append(",\n  descripcion='").append(descripcion).append('\'')
-                .append(",\n  precio=").append(precio)
-                .append(",\n  lotes=").append(lotes)
-                .append(",\n  fechaDeAdicion=").append(fechaDeAdicion)
-                .append("\n}");
-        return sb.toString();
+        return String.format("Producto {\n  id=%d,\n  nombre='%s',\n  descripcion='%s',\n  precio=%.2f,\n  lotes=%s,\n  fechaDeAdicion=%s\n}",
+                id, nombre, descripcion, precio, lotes, fechaDeAdicion);
     }
+
 }

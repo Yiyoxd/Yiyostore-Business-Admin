@@ -16,7 +16,7 @@ import java.util.Objects;
 public class Pedido {
 
     /**
-     * Identificador único del pedido. Auto-generado por la base de datos.
+     * Identificador único del pedido, auto-generado por la base de datos.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,11 +58,24 @@ public class Pedido {
     private LugarCompra lugarCompra;
 
     /**
+     * Estado actual del pedido.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false)
+    private EstadoPedido estado;
+
+    /**
      * Notas adicionales sobre el pedido. Este campo permite almacenar
      * información relevante o comentarios acerca del pedido.
      */
     @Column(name = "notas", length = 500)
     private String notas;
+
+    /**
+     * Constructor por defecto necesario para JPA.
+     */
+    public Pedido() {
+    }
 
     /**
      * Constructor completo para inicializar un pedido con todos sus atributos.
@@ -73,17 +86,16 @@ public class Pedido {
      * @param metodoPago Método de pago utilizado.
      * @param lugarCompra Lugar donde se realizó la compra.
      * @param notas Notas adicionales sobre el pedido.
+     * @param estado Estado actual del pedido.
      */
-    public Pedido(Cliente cliente, LocalDate fecha, List<DetallePedido> detalles, MetodoPago metodoPago, LugarCompra lugarCompra, String notas) {
-        if (cliente == null) {
-            throw new IllegalArgumentException("El cliente no puede ser nulo.");
-        }
+    public Pedido(Cliente cliente, LocalDate fecha, List<DetallePedido> detalles, MetodoPago metodoPago, LugarCompra lugarCompra, String notas, EstadoPedido estado) {
         setCliente(cliente);
-        this.fecha = fecha;
-        this.detalles = detalles != null ? detalles : new ArrayList<>();
+        setFecha(fecha);
         this.metodoPago = metodoPago;
         this.lugarCompra = lugarCompra;
         this.notas = notas;
+        setEstado(estado);
+        setDetalles(detalles);
     }
 
     /**
@@ -120,11 +132,11 @@ public class Pedido {
      * @param cliente Cliente del pedido.
      */
     public void setCliente(Cliente cliente) {
-        if (cliente == null) {
-            throw new IllegalArgumentException("El cliente no puede ser nulo.");
+        if (this.cliente != null) {
+            this.cliente.getPedidos().remove(this);
         }
         this.cliente = cliente;
-        if (!cliente.getPedidos().contains(this)) {
+        if (cliente != null && !cliente.getPedidos().contains(this)) {
             cliente.getPedidos().add(this);
         }
     }
@@ -144,6 +156,9 @@ public class Pedido {
      * @param fecha Fecha del pedido.
      */
     public void setFecha(LocalDate fecha) {
+        if (fecha == null) {
+            throw new IllegalArgumentException("La fecha no puede ser nula");
+        }
         this.fecha = fecha;
     }
 
@@ -162,7 +177,10 @@ public class Pedido {
      * @param detalles Lista de detalles del pedido.
      */
     public void setDetalles(List<DetallePedido> detalles) {
-        this.detalles = detalles;
+        this.detalles.clear();
+        if (detalles != null) {
+            detalles.forEach(this::agregarDetalle);
+        }
     }
 
     /**
@@ -199,6 +217,27 @@ public class Pedido {
      */
     public void setLugarCompra(LugarCompra lugarCompra) {
         this.lugarCompra = lugarCompra;
+    }
+
+    /**
+     * Obtiene el estado actual del pedido.
+     *
+     * @return Estado del pedido.
+     */
+    public EstadoPedido getEstado() {
+        return estado;
+    }
+
+    /**
+     * Establece el estado del pedido.
+     *
+     * @param estado Estado del pedido.
+     */
+    public void setEstado(EstadoPedido estado) {
+        if (estado == null) {
+            throw new IllegalArgumentException("El estado no puede ser nulo");
+        }
+        this.estado = estado;
     }
 
     /**
@@ -278,16 +317,7 @@ public class Pedido {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Pedido{")
-                .append("id=").append(id)
-                .append(", cliente=").append(cliente)
-                .append(", fecha=").append(fecha)
-                .append(", metodoPago=").append(metodoPago)
-                .append(", lugarCompra=").append(lugarCompra)
-                .append(", detalles=").append(detalles)
-                .append(", notas='").append(notas).append('\'')
-                .append('}');
-        return sb.toString();
+        return String.format("Pedido{id=%d, cliente=%s, fecha=%s, metodoPago=%s, lugarCompra=%s, estado=%s, detalles=%s, notas='%s'}",
+                id, cliente != null ? cliente.getId() : "N/A", fecha, metodoPago, lugarCompra, estado, detalles, notas);
     }
 }

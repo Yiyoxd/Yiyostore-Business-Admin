@@ -6,14 +6,15 @@ import java.util.Objects;
 /**
  * Entidad que representa un detalle dentro de un pedido. Cada detalle de pedido
  * está asociado a un producto y a un lote específico de ese producto, y
- * registra la cantidad de productos vendidos.
+ * registra la cantidad de productos vendidos junto con su precio unitario en el
+ * momento del pedido.
  */
 @Entity
 @Table(name = "detalles_pedidos")
 public class DetallePedido {
 
     /**
-     * Identificador único del detalle de pedido. Auto-generado por la base de
+     * Identificador único del detalle de pedido, auto-generado por la base de
      * datos.
      */
     @Id
@@ -22,25 +23,24 @@ public class DetallePedido {
     private Long id;
 
     /**
-     * El pedido al que pertenece este detalle. Este campo establece la relación
-     * muchos a uno entre DetallePedido y Pedido.
+     * El pedido al que pertenece este detalle. Establece la relación muchos a
+     * uno entre DetallePedido y Pedido.
      */
     @ManyToOne
     @JoinColumn(name = "pedido_id", nullable = false)
     private Pedido pedido;
 
     /**
-     * El producto asociado a este detalle de pedido. Este campo establece la
-     * relación muchos a uno entre DetallePedido y Producto.
+     * El producto asociado a este detalle de pedido. Establece la relación
+     * muchos a uno entre DetallePedido y Producto.
      */
     @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
     /**
-     * El lote específico del producto asociado a este detalle de pedido. Este
-     * campo establece la relación muchos a uno entre DetallePedido y
-     * LoteProducto.
+     * El lote específico del producto asociado a este detalle de pedido.
+     * Establece la relación muchos a uno entre DetallePedido y LoteProducto.
      */
     @ManyToOne
     @JoinColumn(name = "lote_id", nullable = false)
@@ -71,20 +71,19 @@ public class DetallePedido {
      *
      * @param pedido El pedido al que pertenece este detalle.
      * @param producto El producto asociado a este detalle.
-     * @param lote El lote específico del producto.
+     * @param lote El lote específico del producto asociado.
      * @param cantidad La cantidad del producto vendida en este detalle.
      * @param precioUnitario El precio unitario del producto en el momento del
      * pedido.
      */
     public DetallePedido(Pedido pedido, Producto producto, LoteProducto lote, int cantidad, double precioUnitario) {
-        this.setPedido(pedido);
-        this.setProducto(producto);
-        this.setLote(lote);
-        this.setCantidad(cantidad);
-        this.setPrecioUnitario(precioUnitario);
+        setPedido(pedido);
+        setProducto(producto);
+        setLote(lote);
+        setCantidad(cantidad);
+        setPrecioUnitario(precioUnitario);
     }
 
-    // Getters y Setters
     /**
      * Obtiene el identificador único del detalle de pedido.
      *
@@ -113,11 +112,16 @@ public class DetallePedido {
     }
 
     /**
-     * Establece el pedido al que pertenece este detalle.
+     * Establece el pedido al que pertenece este detalle y asegura que la
+     * relación bidireccional se mantenga. Si este detalle ya estaba asociado a
+     * otro pedido, se elimina de la lista de detalles de ese pedido.
      *
      * @param pedido El pedido a asociar.
      */
     public void setPedido(Pedido pedido) {
+        if (this.pedido != null) {
+            this.pedido.getDetalles().remove(this);
+        }
         this.pedido = pedido;
         if (pedido != null && !pedido.getDetalles().contains(this)) {
             pedido.getDetalles().add(this);
@@ -134,11 +138,16 @@ public class DetallePedido {
     }
 
     /**
-     * Establece el producto asociado a este detalle de pedido.
+     * Establece el producto asociado a este detalle de pedido. El producto no
+     * puede ser nulo.
      *
      * @param producto El producto a asociar.
+     * @throws IllegalArgumentException si el producto es nulo.
      */
     public void setProducto(Producto producto) {
+        if (producto == null) {
+            throw new IllegalArgumentException("El producto no puede ser nulo");
+        }
         this.producto = producto;
     }
 
@@ -154,11 +163,15 @@ public class DetallePedido {
 
     /**
      * Establece el lote específico del producto asociado a este detalle de
-     * pedido.
+     * pedido. El lote no puede ser nulo.
      *
      * @param lote El lote a asociar.
+     * @throws IllegalArgumentException si el lote es nulo.
      */
     public void setLote(LoteProducto lote) {
+        if (lote == null) {
+            throw new IllegalArgumentException("El lote no puede ser nulo");
+        }
         this.lote = lote;
     }
 
@@ -178,7 +191,7 @@ public class DetallePedido {
      *
      * @param cantidad La cantidad vendida.
      * @throws IllegalArgumentException si la cantidad es negativa o mayor que
-     * la disponible.
+     * la disponible en el lote.
      */
     public void setCantidad(int cantidad) {
         if (cantidad < 0) {
@@ -249,15 +262,8 @@ public class DetallePedido {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("DetallePedido{")
-                .append("id=").append(id)
-                .append(", pedido=").append(pedido)
-                .append(", producto=").append(producto)
-                .append(", lote=").append(lote)
-                .append(", cantidad=").append(cantidad)
-                .append(", precioUnitario=").append(precioUnitario)
-                .append('}');
-        return sb.toString();
+        return String.format("DetallePedido{id=%d, pedido=%s, producto=%s, lote=%s, cantidad=%d, precioUnitario=%.2f}",
+                id, pedido != null ? pedido.getId() : "N/A", producto != null ? producto.getId() : "N/A",
+                lote != null ? lote.getId() : "N/A", cantidad, precioUnitario);
     }
 }

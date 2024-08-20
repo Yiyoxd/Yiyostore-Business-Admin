@@ -91,10 +91,10 @@ public class LoteProducto {
      * @param estado Estado del producto en este lote.
      * @param fecha Fecha en la que se adquirió el lote.
      */
-    public LoteProducto(double costo, int cantidad, Producto producto, String linkDeCompra, String notas, Estado estado, LocalDate fecha) {
+    public LoteProducto(Producto producto, double costo, int cantidad, String linkDeCompra, String notas, Estado estado, LocalDate fecha) {
+        this.producto = producto;
         this.setCosto(costo);
         this.setCantidad(cantidad);
-        this.producto = producto;
         this.linkDeCompra = linkDeCompra;
         this.notas = notas;
         this.estado = estado;
@@ -126,15 +126,6 @@ public class LoteProducto {
      */
     public Producto getProducto() {
         return producto;
-    }
-
-    /**
-     * Establece el producto al que pertenece este lote.
-     *
-     * @param producto Producto al que se asociará el lote.
-     */
-    public void setProducto(Producto producto) {
-        this.producto = producto;
     }
 
     /**

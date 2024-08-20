@@ -1,6 +1,5 @@
 package com.yiyostore.yiyostore_administracion_negocio;
 
-
 import com.yiyostore.yiyostore_administracion_negocio.model.Estado;
 import com.yiyostore.yiyostore_administracion_negocio.model.LoteProducto;
 import com.yiyostore.yiyostore_administracion_negocio.model.Producto;
@@ -14,7 +13,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,8 +36,8 @@ public class ProductoServiceTest {
     void testObtenerTodosLosProductos() {
         // Given
         List<Producto> productos = new ArrayList<>();
-        productos.add(new Producto("Producto1", "Descripción1", 100.0, null, LocalDate.now()));
-        productos.add(new Producto("Producto2", "Descripción2", 200.0, new ArrayList<>(), LocalDate.now()));
+        productos.add(new Producto("Producto1", "Descripción1", 100.0, LocalDate.now()));
+        productos.add(new Producto("Producto2", "Descripción2", 200.0, LocalDate.now()));
         when(productoRepository.findAll()).thenReturn(productos);
 
         // When
@@ -53,7 +51,7 @@ public class ProductoServiceTest {
     @Test
     void testObtenerProductoPorId() {
         // Given
-        Producto producto = new Producto("Producto1", "Descripción1", 100.0, new ArrayList<>(), LocalDate.now());
+        Producto producto = new Producto("Producto1", "Descripción1", 100.0, LocalDate.now());
         when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
 
         // When
@@ -68,7 +66,7 @@ public class ProductoServiceTest {
     @Test
     void testCrearProducto() {
         // Given
-        Producto producto = new Producto("Producto1", "Descripción1", 100.0, new ArrayList<>(), LocalDate.now());
+        Producto producto = new Producto("Producto1", "Descripción1", 100.0, LocalDate.now());
         when(productoRepository.save(producto)).thenReturn(producto);
 
         // When
@@ -83,8 +81,8 @@ public class ProductoServiceTest {
     @Test
     void testActualizarProducto() {
         // Given
-        Producto existingProducto = new Producto("Producto1", "Descripción1", 100.0, new ArrayList<>(), LocalDate.now());
-        Producto updatedProducto = new Producto("ProductoUpdated", "DescripciónUpdated", 150.0, new ArrayList<>(), LocalDate.now());
+        Producto existingProducto = new Producto("Producto1", "Descripción1", 100.0, LocalDate.now());
+        Producto updatedProducto = new Producto("ProductoUpdated", "DescripciónUpdated", 150.0, LocalDate.now());
         when(productoRepository.findById(1L)).thenReturn(Optional.of(existingProducto));
         when(productoRepository.save(existingProducto)).thenReturn(updatedProducto);
 
@@ -115,7 +113,7 @@ public class ProductoServiceTest {
     @Test
     void testObtenerCantidadTotalDisponible() {
         // Given
-        Producto producto = new Producto("Producto1", "Descripción1", 100.0, new ArrayList<>(), LocalDate.now());
+        Producto producto = new Producto("Producto1", "Descripción1", 100.0, LocalDate.now());
         // Agregar lotes y cantidades disponibles a la lista de lotes
         when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
 
@@ -130,8 +128,8 @@ public class ProductoServiceTest {
     @Test
     void testCalcularCostoPromedioPonderado() {
         // Given
-        Producto producto = new Producto("Producto1", "Descripción1", 100.0, null, LocalDate.now());
-        
+        Producto producto = new Producto("Producto1", "Descripción1", 100.0, LocalDate.now());
+
         guardarLotes(producto);
 
         // When
@@ -141,13 +139,12 @@ public class ProductoServiceTest {
         assertEquals(250.0, costoPromedio); // Basado en el estado inicial del producto sin lotes
         verify(productoRepository, times(1)).findById(1L);
     }
-    
+
     private void guardarLotes(Producto producto) {
         List<LoteProducto> lotes = new ArrayList();
-        lotes.add(new LoteProducto(200.0, 20, producto, null, null, Estado.NUEVO, null));
-        lotes.add(new LoteProducto(300.0, 20, producto, null, null, Estado.NUEVO, null));
-        
-        producto.setLotes(lotes);
+        lotes.add(new LoteProducto(producto, 200.0, 20, null, null, Estado.NUEVO, null));
+        lotes.add(new LoteProducto(producto, 300.0, 20, null, null, Estado.NUEVO, null));
+
         // Agregar lotes con costos y cantidades
         when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
     }

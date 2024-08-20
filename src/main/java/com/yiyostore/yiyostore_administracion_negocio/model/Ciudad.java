@@ -1,11 +1,9 @@
 package com.yiyostore.yiyostore_administracion_negocio.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -28,6 +26,13 @@ public class Ciudad {
      */
     @Column(name = "nombre", nullable = false, length = 50)
     private String nombre;
+
+    /**
+     * Lista de colonias asociadas a la ciudad.
+     */
+    @JsonManagedReference
+    @OneToMany(mappedBy = "ciudad", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Colonia> colonias = new ArrayList<>();
 
     /**
      * Constructor por defecto para JPA.
@@ -81,18 +86,53 @@ public class Ciudad {
     }
 
     /**
+     * Obtiene la lista de colonias asociadas a la ciudad.
+     *
+     * @return Lista de colonias.
+     */
+    public List<Colonia> getColonias() {
+        return colonias;
+    }
+
+    /**
+     * Establece la lista de colonias asociadas a la ciudad.
+     *
+     * @param colonias Lista de colonias.
+     */
+    public void setColonias(List<Colonia> colonias) {
+        this.colonias = colonias;
+    }
+
+    /**
+     * Agrega una colonia a la lista de colonias de la ciudad.
+     *
+     * @param colonia La colonia a agregar.
+     */
+    public void agregarColonia(Colonia colonia) {
+        if (colonia != null && !this.colonias.contains(colonia)) {
+            colonias.add(colonia);
+            colonia.setCiudad(this);
+        }
+    }
+
+    /**
+     * Elimina una colonia de la lista de colonias de la ciudad.
+     *
+     * @param colonia La colonia a eliminar.
+     */
+    public void eliminarColonia(Colonia colonia) {
+        colonias.remove(colonia);
+        colonia.setCiudad(null);
+    }
+
+    /**
      * Devuelve una representación en forma de cadena de la ciudad.
      *
      * @return Una cadena que representa la ciudad.
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Ciudad{")
-                .append("id=").append(id)
-                .append(", nombre='").append(nombre).append('\'')
-                .append('}');
-        return sb.toString();
+        return String.format("Ciudad{id=%d, nombre='%s'}", id, nombre);
     }
 
     /**
@@ -111,7 +151,7 @@ public class Ciudad {
             return false;
         }
         Ciudad ciudad = (Ciudad) o;
-        return Objects.equals(id, ciudad.id);
+        return id != null && id.equals(ciudad.id);
     }
 
     /**

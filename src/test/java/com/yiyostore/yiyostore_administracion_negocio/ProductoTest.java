@@ -34,7 +34,7 @@ public class ProductoTest {
         lotes.add(lote1);
         lotes.add(lote2);
 
-        producto = new Producto("Producto A", "Descripción del Producto A", 200.0, lotes, LocalDate.now());
+        producto = new Producto("Producto A", "Descripción del Producto A", 200.0, LocalDate.now());
     }
 
     @Test
