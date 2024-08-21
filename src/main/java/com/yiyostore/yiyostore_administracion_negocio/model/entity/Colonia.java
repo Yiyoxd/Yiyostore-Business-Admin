@@ -1,6 +1,8 @@
 package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.yiyostore.yiyostore_administracion_negocio.model.enums.Tipo;
+import com.yiyostore.yiyostore_administracion_negocio.model.enums.TipoAsentamiento;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -226,53 +228,5 @@ public class Colonia {
 
         final Colonia otra = (Colonia) obj;
         return id.equals(otra.id);
-    }
-}
-
-/**
- * Enum para representar si es Rural o Urbana.
- */
-enum Tipo {
-    RURAL("Rural"),
-    URBANO("Urbano");
-
-    private final String displayName;
-
-    Tipo(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-}
-
-/**
- * Enum para representar los tipos de asentamiento de las colonias.
- */
-enum TipoAsentamiento {
-    COLONIA("Colonia"),
-    FRACCIONAMIENTO("Fraccionamiento"),
-    EJIDO("Ejido"),
-    RANCHERÍA("Ranchería"),
-    GRANJA("Granja"),
-    RANCHO("Rancho"),
-    BARRIO("Barrio"),
-    UNIDAD_HABITACIONAL("Unidad Habitacional"),
-    ZONA_COMERCIAL("Zona Comercial"),
-    ZONA_INDUSTRIAL("Zona Industrial"),
-    EQUIPAMIENTO("Equipamiento"),
-    PARAJE("Paraje"),
-    PUEBLO("Pueblo"),
-    OTRO("Otro");
-
-    private final String displayName;
-
-    TipoAsentamiento(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
     }
 }

@@ -98,7 +98,7 @@ public class Direccion {
         this.nombreCalle = nombreCalle;
         this.numeroExterior = numeroExterior;
         this.numeroInterior = numeroInterior;
-        setColonia(colonia); // Validación interna
+        setColonia(colonia);
         this.entreCalle1 = entreCalle1;
         this.entreCalle2 = entreCalle2;
         this.referencia = referencia;
