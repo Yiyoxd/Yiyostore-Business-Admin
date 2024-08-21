@@ -1,5 +1,6 @@
-package com.yiyostore.yiyostore_administracion_negocio.model;
+package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
+import com.yiyostore.yiyostore_administracion_negocio.model.enums.CategoriaEnum;
 import jakarta.persistence.*;
 
 /**

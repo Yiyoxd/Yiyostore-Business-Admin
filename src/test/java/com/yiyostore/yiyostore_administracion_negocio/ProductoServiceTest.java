@@ -1,8 +1,8 @@
 package com.yiyostore.yiyostore_administracion_negocio;
 
 import com.yiyostore.yiyostore_administracion_negocio.model.Estado;
-import com.yiyostore.yiyostore_administracion_negocio.model.LoteProducto;
-import com.yiyostore.yiyostore_administracion_negocio.model.Producto;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.LoteProducto;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
 import com.yiyostore.yiyostore_administracion_negocio.repository.ProductoRepository;
 import com.yiyostore.yiyostore_administracion_negocio.service.ProductoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -142,8 +142,8 @@ public class ProductoServiceTest {
 
     private void guardarLotes(Producto producto) {
         List<LoteProducto> lotes = new ArrayList();
-        lotes.add(new LoteProducto(producto, 200.0, 20, null, null, Estado.NUEVO, null));
-        lotes.add(new LoteProducto(producto, 300.0, 20, null, null, Estado.NUEVO, null));
+        lotes.add(new LoteProducto(200.0, 20, null, null, Estado.NUEVO, null));
+        lotes.add(new LoteProducto(300.0, 20, null, null, Estado.NUEVO, null));
 
         // Agregar lotes con costos y cantidades
         when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));

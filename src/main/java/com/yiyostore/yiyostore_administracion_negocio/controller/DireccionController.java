@@ -1,6 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.controller;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.Direccion;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Direccion;
 import com.yiyostore.yiyostore_administracion_negocio.service.DireccionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

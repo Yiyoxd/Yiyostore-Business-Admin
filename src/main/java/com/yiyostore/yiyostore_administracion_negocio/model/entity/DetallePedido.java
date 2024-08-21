@@ -1,4 +1,4 @@
-package com.yiyostore.yiyostore_administracion_negocio.model;
+package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
 import jakarta.persistence.*;
 import java.util.Objects;
@@ -29,14 +29,6 @@ public class DetallePedido {
     @ManyToOne
     @JoinColumn(name = "pedido_id", nullable = false)
     private Pedido pedido;
-
-    /**
-     * El producto asociado a este detalle de pedido. Establece la relación
-     * muchos a uno entre DetallePedido y Producto.
-     */
-    @ManyToOne
-    @JoinColumn(name = "producto_id", nullable = false)
-    private Producto producto;
 
     /**
      * El lote específico del producto asociado a este detalle de pedido.
@@ -70,15 +62,13 @@ public class DetallePedido {
      * atributos.
      *
      * @param pedido El pedido al que pertenece este detalle.
-     * @param producto El producto asociado a este detalle.
      * @param lote El lote específico del producto asociado.
      * @param cantidad La cantidad del producto vendida en este detalle.
      * @param precioUnitario El precio unitario del producto en el momento del
      * pedido.
      */
-    public DetallePedido(Pedido pedido, Producto producto, LoteProducto lote, int cantidad, double precioUnitario) {
+    public DetallePedido(Pedido pedido, LoteProducto lote, int cantidad, double precioUnitario) {
         setPedido(pedido);
-        setProducto(producto);
         setLote(lote);
         setCantidad(cantidad);
         setPrecioUnitario(precioUnitario);
@@ -126,29 +116,6 @@ public class DetallePedido {
         if (pedido != null && !pedido.getDetalles().contains(this)) {
             pedido.getDetalles().add(this);
         }
-    }
-
-    /**
-     * Obtiene el producto asociado a este detalle de pedido.
-     *
-     * @return El producto asociado.
-     */
-    public Producto getProducto() {
-        return producto;
-    }
-
-    /**
-     * Establece el producto asociado a este detalle de pedido. El producto no
-     * puede ser nulo.
-     *
-     * @param producto El producto a asociar.
-     * @throws IllegalArgumentException si el producto es nulo.
-     */
-    public void setProducto(Producto producto) {
-        if (producto == null) {
-            throw new IllegalArgumentException("El producto no puede ser nulo");
-        }
-        this.producto = producto;
     }
 
     /**
@@ -262,8 +229,7 @@ public class DetallePedido {
      */
     @Override
     public String toString() {
-        return String.format("DetallePedido{id=%d, pedido=%s, producto=%s, lote=%s, cantidad=%d, precioUnitario=%.2f}",
-                id, pedido != null ? pedido.getId() : "N/A", producto != null ? producto.getId() : "N/A",
-                lote != null ? lote.getId() : "N/A", cantidad, precioUnitario);
+        return String.format("DetallePedido{id=%d, lote=%s, cantidad=%d, precioUnitario=%.2f}",
+                id, lote != null ? lote.getProducto().getNombre() : "N/A", cantidad, precioUnitario);
     }
 }

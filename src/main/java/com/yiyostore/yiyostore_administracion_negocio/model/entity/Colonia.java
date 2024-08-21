@@ -1,4 +1,4 @@
-package com.yiyostore.yiyostore_administracion_negocio.model;
+package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
@@ -154,7 +154,13 @@ public class Colonia {
      * @param ciudad La ciudad a establecer.
      */
     public void setCiudad(Ciudad ciudad) {
+        if (this.ciudad != null && this.ciudad != ciudad) {
+            this.ciudad.getColonias().remove(this);
+        }
         this.ciudad = ciudad;
+        if (ciudad != null && !ciudad.getColonias().contains(this)) {
+            ciudad.getColonias().add(this);
+        }
     }
 
     /**

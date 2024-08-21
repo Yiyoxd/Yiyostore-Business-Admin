@@ -1,4 +1,4 @@
-package com.yiyostore.yiyostore_administracion_negocio.model;
+package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -109,9 +109,14 @@ public class Ciudad {
      * @param colonia La colonia a agregar.
      */
     public void agregarColonia(Colonia colonia) {
-        if (colonia != null && !this.colonias.contains(colonia)) {
+        if (colonia == null) {
+            throw new IllegalArgumentException("La colonia no puede ser nula");
+        }
+        if (!this.colonias.contains(colonia)) {
             colonias.add(colonia);
-            colonia.setCiudad(this);
+            if (colonia.getCiudad() != this) {
+                colonia.setCiudad(this);
+            }
         }
     }
 
@@ -132,7 +137,7 @@ public class Ciudad {
      */
     @Override
     public String toString() {
-        return String.format("Ciudad{id=%d, nombre='%s'}", id, nombre);
+        return String.format("Ciudad{id=%d, nombre='%s, colonias'}", id, nombre, colonias);
     }
 
     /**

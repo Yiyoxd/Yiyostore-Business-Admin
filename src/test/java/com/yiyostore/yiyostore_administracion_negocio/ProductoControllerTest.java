@@ -3,7 +3,7 @@ package com.yiyostore.yiyostore_administracion_negocio;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yiyostore.yiyostore_administracion_negocio.controller.ProductoController;
-import com.yiyostore.yiyostore_administracion_negocio.model.Producto;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
 import com.yiyostore.yiyostore_administracion_negocio.service.ProductoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

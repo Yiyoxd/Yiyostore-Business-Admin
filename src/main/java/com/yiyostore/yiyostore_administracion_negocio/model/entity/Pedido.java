@@ -1,5 +1,9 @@
-package com.yiyostore.yiyostore_administracion_negocio.model;
+package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.yiyostore.yiyostore_administracion_negocio.model.EstadoPedido;
+import com.yiyostore.yiyostore_administracion_negocio.model.enums.LugarCompra;
+import com.yiyostore.yiyostore_administracion_negocio.model.enums.MetodoPago;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,6 +31,7 @@ public class Pedido {
      * Cliente que realizó el pedido.
      */
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
@@ -132,11 +137,14 @@ public class Pedido {
      * @param cliente Cliente del pedido.
      */
     public void setCliente(Cliente cliente) {
+        if (cliente == this.cliente || (cliente != null && cliente.equals(this.cliente))) {
+            return;
+        }
         if (this.cliente != null) {
             this.cliente.getPedidos().remove(this);
         }
         this.cliente = cliente;
-        if (cliente != null && !cliente.getPedidos().contains(this)) {
+        if (cliente != null) {
             cliente.getPedidos().add(this);
         }
     }
@@ -179,7 +187,7 @@ public class Pedido {
     public void setDetalles(List<DetallePedido> detalles) {
         this.detalles.clear();
         if (detalles != null) {
-            detalles.forEach(this::agregarDetalle);
+            this.detalles.addAll(detalles);
         }
     }
 

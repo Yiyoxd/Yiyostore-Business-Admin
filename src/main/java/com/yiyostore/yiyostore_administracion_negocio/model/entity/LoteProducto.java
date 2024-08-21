@@ -1,6 +1,7 @@
-package com.yiyostore.yiyostore_administracion_negocio.model;
+package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.yiyostore.yiyostore_administracion_negocio.model.Estado;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -85,20 +86,18 @@ public class LoteProducto {
      *
      * @param costo Costo del producto en este lote.
      * @param cantidad Cantidad disponible de productos en este lote.
-     * @param producto El producto al que pertenece este lote.
      * @param linkDeCompra Link de compra del lote.
      * @param notas Notas adicionales sobre el estado del lote.
      * @param estado Estado del producto en este lote.
      * @param fecha Fecha en la que se adquirió el lote.
      */
-    public LoteProducto(Producto producto, double costo, int cantidad, String linkDeCompra, String notas, Estado estado, LocalDate fecha) {
-        this.producto = producto;
-        this.setCosto(costo);
-        this.setCantidad(cantidad);
+    public LoteProducto(double costo, int cantidad, String linkDeCompra, String notas, Estado estado, LocalDate fecha) {
+        setCosto(costo);
+        setCantidad(cantidad);
         this.linkDeCompra = linkDeCompra;
         this.notas = notas;
-        this.estado = estado;
-        this.fecha = fecha;
+        this.estado = estado != null ? estado : Estado.NUEVO;
+        this.fecha = fecha != null ? fecha : LocalDate.now();
     }
 
     /**
@@ -126,6 +125,20 @@ public class LoteProducto {
      */
     public Producto getProducto() {
         return producto;
+    }
+    
+    public void setProducto(Producto producto) {
+        if (producto == null) {
+            throw new IllegalArgumentException("El producto no puede ser nulo");
+        }
+        
+        if (this.producto == producto) {
+            return;
+        }
+        
+        
+        
+        
     }
 
     /**

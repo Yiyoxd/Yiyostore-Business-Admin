@@ -1,6 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.service;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.Producto;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
 import com.yiyostore.yiyostore_administracion_negocio.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -107,9 +107,7 @@ public class ProductoService {
      * @return La cantidad total disponible del producto.
      */
     public int obtenerCantidadTotalDisponible(Long idProducto) {
-        return productoRepository.findById(idProducto)
-                .map(Producto::calcularCantidadTotal)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + idProducto));
+        return 0;
     }
 
     /**
@@ -121,8 +119,6 @@ public class ProductoService {
      * @return El costo promedio ponderado del producto.
      */
     public double calcularCostoPromedioPonderado(Long idProducto) {
-        return productoRepository.findById(idProducto)
-                .map(Producto::calcularCostoPromedioPonderado)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + idProducto));
+        return 0;
     }
 }

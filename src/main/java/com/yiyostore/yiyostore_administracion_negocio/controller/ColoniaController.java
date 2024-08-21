@@ -1,6 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.controller;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.Colonia;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Colonia;
 import com.yiyostore.yiyostore_administracion_negocio.service.ColoniaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -58,17 +58,17 @@ public class ColoniaController {
      *
      * @param id ID de la colonia a actualizar.
      * @param colonia Datos de la colonia a actualizar.
-     * @return La colonia actualizada.
+     * @return ResponseEntity con la colonia actualizada o un estado de error.
      */
     @PutMapping("/{id}")
     public ResponseEntity<Colonia> updateColonia(@PathVariable Long id, @RequestBody Colonia colonia) {
-        Optional<Colonia> existingColonia = coloniaService.findById(id);
-        if (existingColonia.isPresent()) {
-            colonia.setId(id);
-            return ResponseEntity.ok(coloniaService.save(colonia));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return coloniaService.findById(id)
+                .map(existingColonia -> {
+                    colonia.setId(id);
+                    Colonia updatedColonia = coloniaService.save(colonia);
+                    return ResponseEntity.ok(updatedColonia);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
@@ -79,7 +79,11 @@ public class ColoniaController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteColonia(@PathVariable Long id) {
-        coloniaService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        if (coloniaService.existsById(id)) {
+            coloniaService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

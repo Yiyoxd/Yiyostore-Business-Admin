@@ -1,6 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.repository;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.Pedido;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Pedido;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

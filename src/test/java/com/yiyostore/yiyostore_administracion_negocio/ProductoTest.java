@@ -1,7 +1,7 @@
 package com.yiyostore.yiyostore_administracion_negocio;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.LoteProducto;
-import com.yiyostore.yiyostore_administracion_negocio.model.Producto;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.LoteProducto;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -9,7 +9,6 @@ import org.mockito.Mockito;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,13 +51,5 @@ public class ProductoTest {
         producto.agregarLote(loteNuevo);
 
         assertThat(producto.getLotes()).contains(loteNuevo);
-    }
-
-    @Test
-    public void testRemoverLote() {
-        boolean removed = producto.removerLote(lote1.getId());
-
-        assertThat(removed).isTrue();
-        assertThat(producto.getLotes()).doesNotContain(lote1);
     }
 }

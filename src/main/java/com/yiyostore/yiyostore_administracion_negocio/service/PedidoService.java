@@ -1,5 +1,9 @@
 package com.yiyostore.yiyostore_administracion_negocio.service;
 
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.LoteProducto;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Pedido;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.DetallePedido;
 import com.yiyostore.yiyostore_administracion_negocio.exception.InsufficientStockException;
 import com.yiyostore.yiyostore_administracion_negocio.model.*;
 import com.yiyostore.yiyostore_administracion_negocio.repository.LoteProductoRepository;
@@ -127,7 +131,7 @@ public class PedidoService {
      * cantidad solicitada.
      */
     private void aplicarPEPS(DetallePedido detalle) {
-        Producto producto = detalle.getProducto();
+        Producto producto = detalle.getLote().getProducto();
         int cantidadSolicitada = detalle.getCantidad();
         List<LoteProducto> lotes = obtenerLotesOrdenadosPorFecha(producto);
 
@@ -188,7 +192,7 @@ public class PedidoService {
      * adicional.
      */
     private void crearDetalleAdicional(DetallePedido detalle, LoteProducto lote, int cantidadADescontar) {
-        DetallePedido nuevoDetalle = new DetallePedido(detalle.getPedido(), detalle.getProducto(), lote, cantidadADescontar, detalle.getPrecioUnitario());
+        DetallePedido nuevoDetalle = new DetallePedido(detalle.getPedido(), lote, cantidadADescontar, detalle.getPrecioUnitario());
         detalle.getPedido().agregarDetalle(nuevoDetalle);
     }
 

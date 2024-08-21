@@ -1,6 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.service;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.Categoria;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Categoria;
 import com.yiyostore.yiyostore_administracion_negocio.repository.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

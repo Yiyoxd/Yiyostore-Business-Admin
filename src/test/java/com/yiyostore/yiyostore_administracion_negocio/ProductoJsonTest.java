@@ -2,7 +2,7 @@ package com.yiyostore.yiyostore_administracion_negocio;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yiyostore.yiyostore_administracion_negocio.model.Producto;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
 import com.yiyostore.yiyostore_administracion_negocio.repository.ProductoRepository;
 import com.yiyostore.yiyostore_administracion_negocio.service.ProductoService;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.repository;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.Ciudad;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Ciudad;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

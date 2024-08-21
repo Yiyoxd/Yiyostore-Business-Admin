@@ -1,6 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.Cliente;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Cliente;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

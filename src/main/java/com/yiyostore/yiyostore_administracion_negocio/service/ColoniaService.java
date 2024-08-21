@@ -1,7 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.service;
 
-
-import com.yiyostore.yiyostore_administracion_negocio.model.Colonia;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Colonia;
 import com.yiyostore.yiyostore_administracion_negocio.repository.ColoniaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,8 @@ public class ColoniaService {
      * Busca una colonia por su ID.
      *
      * @param id Identificador de la colonia.
-     * @return Un Optional que contiene la colonia si se encuentra, de lo contrario vacío.
+     * @return Un Optional que contiene la colonia si se encuentra, de lo
+     * contrario vacío.
      */
     public Optional<Colonia> findById(Long id) {
         return coloniaRepository.findById(id);
@@ -55,4 +55,17 @@ public class ColoniaService {
     public void deleteById(Long id) {
         coloniaRepository.deleteById(id);
     }
+
+    /**
+     * Verifica si una colonia con el ID especificado existe en la base de
+     * datos.
+     *
+     * @param id El ID de la colonia a verificar.
+     * @return {@code true} si una colonia con el ID especificado existe,
+     * {@code false} en caso contrario.
+     */
+    public boolean existsById(Long id) {
+        return coloniaRepository.existsById(id);
+    }
+
 }

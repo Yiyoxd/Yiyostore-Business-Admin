@@ -1,8 +1,7 @@
 package com.yiyostore.yiyostore_administracion_negocio.service;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.LoteProducto;
-import com.yiyostore.yiyostore_administracion_negocio.model.Producto;
-import com.yiyostore.yiyostore_administracion_negocio.repository.LoteProductoRepository;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.LoteProducto;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
 import com.yiyostore.yiyostore_administracion_negocio.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,8 +30,7 @@ public class InventarioService {
             return false;
         }
 
-        int cantidadTotalDisponible = producto.calcularCantidadTotal();
-        return cantidadTotalDisponible >= cantidadSolicitada;
+        return false;
     }
 
     /**
@@ -54,5 +52,5 @@ public class InventarioService {
 
         return costoTotalInventario;
     }
-    
+
 }

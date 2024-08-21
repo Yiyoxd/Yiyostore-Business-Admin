@@ -1,4 +1,4 @@
-package com.yiyostore.yiyostore_administracion_negocio.model;
+package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -53,7 +53,7 @@ public class Producto {
      * Fecha en que el producto fue añadido al inventario.
      */
     @Column(name = "fecha_adicion")
-    private LocalDate fechaDeAdicion;
+    private LocalDate fechaAdicion;
 
     /**
      * Constructor vacío requerido por JPA.
@@ -67,13 +67,13 @@ public class Producto {
      * @param nombre Nombre del producto.
      * @param descripcion Descripción detallada del producto.
      * @param precio Precio de venta del producto.
-     * @param fechaDeAdicion Fecha en que el producto fue añadido al inventario.
+     * @param fechaAdicion Fecha en que el producto fue añadido al inventario.
      */
-    public Producto(String nombre, String descripcion, double precio, LocalDate fechaDeAdicion) {
+    public Producto(String nombre, String descripcion, double precio, LocalDate fechaAdicion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.setPrecio(precio);
-        this.fechaDeAdicion = fechaDeAdicion;
+        this.fechaAdicion = fechaAdicion != null ? fechaAdicion : LocalDate.now();
     }
 
     /**
@@ -168,7 +168,7 @@ public class Producto {
      * @return La fecha de adición del producto.
      */
     public LocalDate getFechaDeAdicion() {
-        return fechaDeAdicion;
+        return fechaAdicion;
     }
 
     /**
@@ -177,7 +177,7 @@ public class Producto {
      * @param fechaDeAdicion La nueva fecha de adición del producto.
      */
     public void setFechaDeAdicion(LocalDate fechaDeAdicion) {
-        this.fechaDeAdicion = fechaDeAdicion;
+        this.fechaAdicion = fechaDeAdicion;
     }
 
     /**
@@ -190,54 +190,11 @@ public class Producto {
         if (lote == null) {
             throw new IllegalArgumentException("El lote no puede ser nulo");
         }
-
-        if (lote.getProducto() != null && !lote.getProducto().equals(this)) {
-            throw new IllegalArgumentException("El lote ya pertenece a otro producto");
-        }
-
+        
         if (!this.lotes.contains(lote)) {
+            lote.setProducto(this);
             this.lotes.add(lote);
         }
-    }
-
-    /**
-     * Remueve un lote específico de la lista de lotes del producto.
-     *
-     * @param idLote El identificador del lote a remover.
-     * @return true si el lote fue removido, false si no se encontró.
-     */
-    public boolean removerLote(long idLote) {
-        return this.lotes.removeIf(lote -> lote.getId() == idLote);
-    }
-
-    /**
-     * Calcula la cantidad total disponible del producto sumando las cantidades
-     * de todos sus lotes.
-     *
-     * @return La cantidad total disponible del producto.
-     */
-    public int calcularCantidadTotal() {
-        return this.lotes.stream()
-                .mapToInt(LoteProducto::getCantidad)
-                .sum();
-    }
-
-    /**
-     * Calcula el costo promedio ponderado del producto basado en los lotes
-     * disponibles.
-     *
-     * @return El costo promedio ponderado del producto.
-     */
-    public double calcularCostoPromedioPonderado() {
-        double costoTotal = 0;
-        int cantidadTotal = 0;
-
-        for (LoteProducto lote : this.lotes) {
-            costoTotal += lote.getCosto() * lote.getCantidad();
-            cantidadTotal += lote.getCantidad();
-        }
-
-        return cantidadTotal > 0 ? costoTotal / cantidadTotal : 0.0;
     }
 
     /**
@@ -277,7 +234,7 @@ public class Producto {
     @Override
     public String toString() {
         return String.format("Producto {\n  id=%d,\n  nombre='%s',\n  descripcion='%s',\n  precio=%.2f,\n  lotes=%s,\n  fechaDeAdicion=%s\n}",
-                id, nombre, descripcion, precio, lotes, fechaDeAdicion);
+                id, nombre, descripcion, precio, lotes, fechaAdicion);
     }
 
 }

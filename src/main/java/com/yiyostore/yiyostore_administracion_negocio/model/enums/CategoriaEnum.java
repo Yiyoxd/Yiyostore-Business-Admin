@@ -1,4 +1,6 @@
-package com.yiyostore.yiyostore_administracion_negocio.model;
+package com.yiyostore.yiyostore_administracion_negocio.model.enums;
+
+import com.yiyostore.yiyostore_administracion_negocio.model.*;
 
 /**
  * Enum que representa las categorías disponibles para los productos con nombres

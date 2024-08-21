@@ -1,6 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.controller;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.Ciudad;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Ciudad;
 import com.yiyostore.yiyostore_administracion_negocio.service.CiudadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -1,5 +1,6 @@
-package com.yiyostore.yiyostore_administracion_negocio.model;
+package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.yiyostore.yiyostore_administracion_negocio.exception.NumeroTelefonoInvalidoException;
 import com.yiyostore.yiyostore_administracion_negocio.utils.TelefonoUtils;
 import jakarta.persistence.*;
@@ -37,10 +38,7 @@ public class Cliente {
     /**
      * Dirección residencial del cliente. Relación uno a uno con la entidad
      * {@link Direccion}. Este campo es opcional y puede ser nulo si el cliente
-     * no proporciona una dirección. La dirección se carga de manera perezosa
-     * (lazy) y todas las operaciones de persistencia realizadas en el cliente
-     * se propagarán a la dirección. Si la dirección es eliminada del cliente,
-     * también se eliminará de la base de datos (orphanRemoval = true).
+     * no proporciona una dirección.
      */
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "direccion_id", nullable = true)
@@ -56,8 +54,7 @@ public class Cliente {
 
     /**
      * Notas adicionales sobre el cliente. Este campo es opcional y puede
-     * contener cualquier información adicional relevante sobre el cliente. Se
-     * limita a 255 caracteres.
+     * contener cualquier información adicional relevante sobre el cliente.
      */
     @Column(name = "notas", length = 255, nullable = true)
     private String notas;
@@ -66,7 +63,8 @@ public class Cliente {
      * Relación uno a muchos con la entidad {@link Pedido}. Un cliente puede
      * tener múltiples pedidos.
      */
-    @OneToMany(mappedBy = "cliente")
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Pedido> pedidos = new ArrayList<>();
 
     /**
@@ -215,8 +213,8 @@ public class Cliente {
      */
     @Override
     public String toString() {
-        return String.format("Cliente {ID=%d, Nombre='%s', Dirección=%s, Número de Teléfono='%s', Notas='%s'}",
-                id, nombre, direccion, numeroTelefono, notas);
+        return String.format("Cliente {ID=%d, Nombre='%s, Número de Teléfono='%s', Notas='%s'}",
+                id, nombre, numeroTelefono, notas);
     }
 
     /**
@@ -234,7 +232,7 @@ public class Cliente {
             return false;
         }
         Cliente cliente = (Cliente) o;
-        return id.equals(cliente.id);
+        return Objects.equals(cliente.id, id);
     }
 
     /**
