@@ -1,5 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.controller;
 
+import com.yiyostore.yiyostore_administracion_negocio.model.dto.PedidoDTO;
 import com.yiyostore.yiyostore_administracion_negocio.model.entity.Pedido;
 import com.yiyostore.yiyostore_administracion_negocio.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +33,12 @@ public class PedidoController {
      * Crea un nuevo pedido aplicando la metodología PEPS para ajustar el
      * inventario.
      *
-     * @param pedido El pedido a crear.
+     * @param pedidoDTO El pedido a crear.
      * @return El pedido creado.
      */
     @PostMapping
-    public ResponseEntity<Pedido> crearPedido(@RequestBody Pedido pedido) {
-        Pedido pedidoCreado = pedidoService.realizarPedido(pedido);
+    public ResponseEntity<Pedido> crearPedido(@RequestBody PedidoDTO pedidoDTO) {
+        Pedido pedidoCreado = pedidoService.realizarPedidoDTO(pedidoDTO);
         return ResponseEntity.ok(pedidoCreado);
     }
 

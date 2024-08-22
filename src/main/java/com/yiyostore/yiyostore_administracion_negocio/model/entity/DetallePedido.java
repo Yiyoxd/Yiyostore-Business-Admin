@@ -119,6 +119,30 @@ public class DetallePedido {
     }
 
     /**
+     * Asocia este DetallePedido a un nuevo Pedido sin realizar ninguna
+     * verificación adicional. Este método permite cambiar la relación entre un
+     * DetallePedido y un Pedido de manera directa.
+     *
+     * <p>
+     * Este método debe ser utilizado con precaución, ya que no realiza
+     * verificaciones de integridad o consistencia. Es posible que se necesiten
+     * validaciones adicionales para asegurar que el cambio no rompa la lógica
+     * de negocio o cause inconsistencias en la base de datos.</p>
+     *
+     * <p>
+     * Se recomienda usar este método solo en situaciones controladas donde la
+     * consistencia ya esté garantizada, o como parte de una operación más
+     * amplia que maneje correctamente la relación bidireccional entre Pedido y
+     * DetallePedido.</p>
+     *
+     * @param pedido el nuevo Pedido al que este DetallePedido debe estar
+     * asociado.
+     */
+    public void cambiarDePedidoSinVerificar(Pedido pedido) {
+        this.pedido = pedido;
+    }
+
+    /**
      * Obtiene el lote específico del producto asociado a este detalle de
      * pedido.
      *
@@ -163,9 +187,6 @@ public class DetallePedido {
     public void setCantidad(int cantidad) {
         if (cantidad < 0) {
             throw new IllegalArgumentException("La cantidad no puede ser negativa");
-        }
-        if (lote != null && cantidad > lote.getCantidad()) {
-            throw new IllegalArgumentException("La cantidad no puede ser mayor que la cantidad disponible en el lote");
         }
         this.cantidad = cantidad;
     }

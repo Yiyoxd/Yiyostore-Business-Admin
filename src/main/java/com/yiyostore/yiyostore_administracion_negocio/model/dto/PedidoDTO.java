@@ -2,6 +2,7 @@ package com.yiyostore.yiyostore_administracion_negocio.model.dto;
 
 import com.yiyostore.yiyostore_administracion_negocio.model.enums.LugarCompra;
 import com.yiyostore.yiyostore_administracion_negocio.model.enums.MetodoPago;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -18,11 +19,13 @@ import java.util.List;
  * pedido.
  * @param detalles Lista de detalles del pedido. Cada detalle contiene la
  * información sobre un producto específico y la cantidad solicitada.
+ * @param fecha Fecha en que se realizó el pedido.
  */
 public record PedidoDTO(
         Long clienteId,
         MetodoPago metodoPago,
         LugarCompra lugarCompra,
         String notas,
-        List<DetallePedidoDTO> detalles
+        List<DetallePedidoDTO> detalles,
+        LocalDate fecha
 ) {}

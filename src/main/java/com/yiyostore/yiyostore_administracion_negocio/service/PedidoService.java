@@ -1,17 +1,25 @@
 package com.yiyostore.yiyostore_administracion_negocio.service;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
+import com.yiyostore.yiyostore_administracion_negocio.exception.InsufficientStockException;
+import com.yiyostore.yiyostore_administracion_negocio.model.Estado;
+import com.yiyostore.yiyostore_administracion_negocio.model.EstadoPedido;
+import com.yiyostore.yiyostore_administracion_negocio.model.dto.DetallePedidoDTO;
+import com.yiyostore.yiyostore_administracion_negocio.model.dto.PedidoDTO;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Cliente;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.DetallePedido;
 import com.yiyostore.yiyostore_administracion_negocio.model.entity.LoteProducto;
 import com.yiyostore.yiyostore_administracion_negocio.model.entity.Pedido;
-import com.yiyostore.yiyostore_administracion_negocio.model.entity.DetallePedido;
-import com.yiyostore.yiyostore_administracion_negocio.exception.InsufficientStockException;
-import com.yiyostore.yiyostore_administracion_negocio.model.*;
+import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
+import com.yiyostore.yiyostore_administracion_negocio.repository.ClienteRepository;
 import com.yiyostore.yiyostore_administracion_negocio.repository.LoteProductoRepository;
 import com.yiyostore.yiyostore_administracion_negocio.repository.PedidoRepository;
+import com.yiyostore.yiyostore_administracion_negocio.repository.ProductoRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,52 +33,152 @@ public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final LoteProductoRepository loteProductoRepository;
+    private final ClienteRepository clienteRepository;
+    private final ProductoRepository productoRepository;
 
     /**
      * Constructor que inyecta las dependencias necesarias para este servicio.
      *
      * @param pedidoRepository Repositorio para la entidad Pedido.
      * @param loteProductoRepository Repositorio para la entidad LoteProducto.
+     * @param clienteRepository Repositorio para la entidad Cliente.
+     * @param productoRepository Repositorio para la entidad Producto.
      */
     @Autowired
-    public PedidoService(PedidoRepository pedidoRepository, LoteProductoRepository loteProductoRepository) {
+    public PedidoService(
+            PedidoRepository pedidoRepository,
+            LoteProductoRepository loteProductoRepository,
+            ClienteRepository clienteRepository,
+            ProductoRepository productoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.loteProductoRepository = loteProductoRepository;
+        this.clienteRepository = clienteRepository;
+        this.productoRepository = productoRepository;
     }
 
     /**
-     * Realiza un pedido, aplicando la metodología PEPS para ajustar el
-     * inventario y registrando el pedido en la base de datos.
+     * Realiza un pedido basado en un PedidoDTO.
      *
-     * @param pedido El pedido a realizar.
-     * @return El pedido realizado con los ajustes de inventario aplicados.
+     * @param pedidoDTO el objeto DTO que contiene los datos necesarios para
+     * crear un pedido.
+     * @return el Pedido creado y guardado en la base de datos.
      */
     @Transactional
-    public Pedido realizarPedido(Pedido pedido) {
-        pedido.getDetalles().forEach(this::aplicarPEPS);
+    public Pedido realizarPedidoDTO(PedidoDTO pedidoDTO) {
+        List<DetallePedido> detalles = crearDetallesDesdeDTO(pedidoDTO.detalles());
+        Cliente cliente = clienteRepository.findById(pedidoDTO.clienteId()).orElseThrow();
+        
+        Pedido pedido = new Pedido(
+                cliente,
+                pedidoDTO.fecha(),
+                detalles,
+                pedidoDTO.metodoPago(),
+                pedidoDTO.lugarCompra(),
+                pedidoDTO.notas(),
+                EstadoPedido.PENDIENTE
+        );
+        
+        detalles.forEach(detalle -> detalle.cambiarDePedidoSinVerificar(pedido));
+        
         return pedidoRepository.save(pedido);
     }
 
     /**
-     * Actualiza un pedido existente, revertiendo los ajustes de inventario
-     * anteriores y aplicando los nuevos conforme a la metodología PEPS.
+     * Convierte una lista de DetallePedidoDTO en una lista de DetallePedido.
      *
-     * @param pedidoExistente El pedido existente a actualizar.
-     * @param pedidoActualizado Los detalles actualizados del pedido.
-     * @return El pedido actualizado con los nuevos ajustes de inventario.
+     * @param detallesDTO la lista de objetos DTO que representan los detalles
+     * del pedido.
+     * @return una lista de objetos DetallePedido.
+     */
+    private List<DetallePedido> crearDetallesDesdeDTO(List<DetallePedidoDTO> detallesDTO) {
+        List<DetallePedido> detalles = new ArrayList<>();
+        detallesDTO.forEach(dto -> detalles.addAll(crearDetallesProductoDesdeDTO(dto)));
+        return detalles;
+    }
+
+    /**
+     * Convierte un DetallePedidoDTO en una lista de DetallePedido asociados con
+     * un producto.
+     *
+     * @param detallePedidoDTO el DTO que contiene la información del producto y
+     * cantidad.
+     * @return una lista de objetos DetallePedido.
+     */
+    private List<DetallePedido> crearDetallesProductoDesdeDTO(DetallePedidoDTO detallePedidoDTO) {
+        Producto producto = productoRepository.findById(detallePedidoDTO.idProducto()).orElseThrow();
+        int cantidad = detallePedidoDTO.cantidad();
+
+        return crearDetallesProducto(producto, cantidad);
+    }
+
+    /**
+     * Crea una lista de DetallePedido para un producto específico,
+     * distribuyendo la cantidad entre los lotes disponibles.
+     *
+     * @param producto el producto para el cual se crearán los detalles del
+     * pedido.
+     * @param cantidad la cantidad solicitada del producto.
+     * @return una lista de objetos DetallePedido.
+     * @throws InsufficientStockException si no hay suficiente stock disponible
+     * para cumplir con el pedido.
+     */
+    public List<DetallePedido> crearDetallesProducto(Producto producto, int cantidad) {
+        List<LoteProducto> lotes = obtenerLotesOrdenadosPorFecha(producto);
+        List<DetallePedido> detalles = new ArrayList<>();
+
+        for (LoteProducto lote : lotes) {
+            if (cantidad <= 0) {
+                break;
+            }
+            int cantidadADescontar = ajustarLote(lote, cantidad);
+            cantidad -= cantidadADescontar;
+
+            DetallePedido detalle = new DetallePedido(null, lote, cantidadADescontar, producto.getPrecio());
+            detalles.add(detalle);
+        }
+
+        if (cantidad > 0) {
+            throw new InsufficientStockException("Stock insuficiente para el producto " + producto.getNombre());
+        }
+
+        return detalles;
+    }
+
+    /**
+     * Ajusta la cantidad de un lote específico, descontando la cantidad
+     * utilizada.
+     *
+     * @param lote el lote a ajustar.
+     * @param cantidad la cantidad a descontar del lote.
+     */
+    private int ajustarLote(LoteProducto lote, int cantidad) {
+        int cantidadADescontar = Math.min(cantidad, lote.getCantidad());
+        lote.setCantidad(lote.getCantidad() - cantidadADescontar);
+        loteProductoRepository.save(lote);
+
+        return cantidadADescontar;
+    }
+
+    /**
+     * Actualiza un pedido existente, revertiendo los ajustes de inventario
+     * anteriores y aplicando los nuevos.
+     *
+     * @param pedidoExistente el pedido existente a actualizar.
+     * @param pedidoActualizado los detalles actualizados del pedido.
+     * @return el pedido actualizado con los nuevos ajustes de inventario.
      */
     @Transactional
     public Pedido actualizarPedido(Pedido pedidoExistente, Pedido pedidoActualizado) {
         revertirAjusteInventario(pedidoExistente);
         actualizarDetallesPedido(pedidoExistente, pedidoActualizado);
-        return realizarPedido(pedidoExistente);
+        return pedidoRepository.save(pedidoExistente);
     }
 
     /**
      * Elimina un pedido por su ID, revertiendo los ajustes de inventario
      * correspondientes antes de la eliminación.
      *
-     * @param id El ID del pedido a eliminar.
+     * @param id el ID del pedido a eliminar.
      * @return true si el pedido se eliminó correctamente, false si no se
      * encontró el pedido.
      */
@@ -86,10 +194,10 @@ public class PedidoService {
     }
 
     /**
-     * Reverte los ajustes de inventario realizados por un pedido, devolviendo
+     * Revierte los ajustes de inventario realizados por un pedido, devolviendo
      * las cantidades utilizadas a los lotes correspondientes.
      *
-     * @param pedido El pedido cuyos ajustes de inventario se deben revertir.
+     * @param pedido el pedido cuyos ajustes de inventario se deben revertir.
      */
     @Transactional
     public void revertirAjusteInventario(Pedido pedido) {
@@ -105,7 +213,7 @@ public class PedidoService {
     /**
      * Obtiene una lista de todos los pedidos almacenados en la base de datos.
      *
-     * @return Una lista de pedidos.
+     * @return una lista de pedidos.
      */
     public List<Pedido> obtenerTodosLosPedidos() {
         return pedidoRepository.findAll();
@@ -114,8 +222,8 @@ public class PedidoService {
     /**
      * Busca un pedido por su ID.
      *
-     * @param id El ID del pedido a buscar.
-     * @return Un Optional que contiene el pedido si se encuentra, o vacío si no
+     * @param id el ID del pedido a buscar.
+     * @return un Optional que contiene el pedido si se encuentra, o vacío si no
      * se encuentra.
      */
     public Optional<Pedido> obtenerPedidoPorId(Long id) {
@@ -123,77 +231,14 @@ public class PedidoService {
     }
 
     /**
-     * Aplica la metodología PEPS para ajustar el inventario de un detalle de
-     * pedido. Este proceso reduce las cantidades de los lotes en el orden en
-     * que fueron adquiridos.
-     *
-     * @param detalle El detalle del pedido que contiene el producto y la
-     * cantidad solicitada.
-     */
-    private void aplicarPEPS(DetallePedido detalle) {
-        Producto producto = detalle.getLote().getProducto();
-        int cantidadSolicitada = detalle.getCantidad();
-        List<LoteProducto> lotes = obtenerLotesOrdenadosPorFecha(producto);
-
-        for (LoteProducto lote : lotes) {
-            if (cantidadSolicitada <= 0) {
-                break;
-            }
-            cantidadSolicitada -= ajustarLote(detalle, lote, cantidadSolicitada);
-        }
-
-        if (cantidadSolicitada > 0) {
-            throw new InsufficientStockException("No hay suficiente stock disponible para el producto: " + producto.getNombre());
-        }
-    }
-
-    /**
      * Obtiene una lista de lotes de un producto, ordenados por fecha de
      * adquisición en orden ascendente.
      *
-     * @param producto El producto del cual obtener los lotes.
-     * @return Una lista de lotes ordenados por fecha de adquisición.
+     * @param producto el producto del cual obtener los lotes.
+     * @return una lista de lotes ordenados por fecha de adquisición.
      */
     private List<LoteProducto> obtenerLotesOrdenadosPorFecha(Producto producto) {
         return loteProductoRepository.findByProductoAndEstadoInOrderByFechaAsc(producto, List.of(Estado.NUEVO, Estado.REACONDICIONADO));
-    }
-
-    /**
-     * Ajusta la cantidad disponible en un lote específico para satisfacer una
-     * parte o la totalidad de la cantidad solicitada en un detalle de pedido.
-     *
-     * @param detalle El detalle del pedido que solicita el producto.
-     * @param lote El lote del cual se descontará la cantidad solicitada.
-     * @param cantidadSolicitada La cantidad que se debe satisfacer.
-     * @return La cantidad realmente descontada del lote.
-     */
-    private int ajustarLote(DetallePedido detalle, LoteProducto lote, int cantidadSolicitada) {
-        int cantidadDisponible = lote.getCantidad();
-        int cantidadADescontar = Math.min(cantidadSolicitada, cantidadDisponible);
-
-        lote.setCantidad(cantidadDisponible - cantidadADescontar);
-
-        if (detalle.getLote() == null) {
-            detalle.setLote(lote);
-        } else {
-            crearDetalleAdicional(detalle, lote, cantidadADescontar);
-        }
-
-        return cantidadADescontar;
-    }
-
-    /**
-     * Crea un detalle de pedido adicional si el producto solicitado debe
-     * satisfacerse con múltiples lotes.
-     *
-     * @param detalle El detalle de pedido original.
-     * @param lote El lote adicional que se utilizará.
-     * @param cantidadADescontar La cantidad que se descontará del lote
-     * adicional.
-     */
-    private void crearDetalleAdicional(DetallePedido detalle, LoteProducto lote, int cantidadADescontar) {
-        DetallePedido nuevoDetalle = new DetallePedido(detalle.getPedido(), lote, cantidadADescontar, detalle.getPrecioUnitario());
-        detalle.getPedido().agregarDetalle(nuevoDetalle);
     }
 
     /**
@@ -201,12 +246,12 @@ public class PedidoService {
      * pedido actualizado. Se eliminan los detalles existentes y se reemplazan
      * por los nuevos.
      *
-     * @param pedidoExistente El pedido que se va a actualizar.
-     * @param pedidoActualizado El pedido con los nuevos detalles.
+     * @param pedidoExistente el pedido que se va a actualizar.
+     * @param pedidoActualizado el pedido con los nuevos detalles.
      */
     private void actualizarDetallesPedido(Pedido pedidoExistente, Pedido pedidoActualizado) {
         pedidoExistente.getDetalles().clear();
-        pedidoActualizado.getDetalles().forEach(pedidoExistente::agregarDetalle);
+        pedidoActualizado.setDetalles(pedidoActualizado.getDetalles());
         pedidoExistente.setCliente(pedidoActualizado.getCliente());
         pedidoExistente.setFecha(pedidoActualizado.getFecha());
         pedidoExistente.setMetodoPago(pedidoActualizado.getMetodoPago());
