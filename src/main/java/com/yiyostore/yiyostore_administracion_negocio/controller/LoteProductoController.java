@@ -33,6 +33,7 @@ public class LoteProductoController {
      */
     @GetMapping
     public List<LoteProducto> getAllLotes() {
+        System.out.println("xdxdxd");
         return loteProductoService.obtenerTodosLosLotes();
     }
 

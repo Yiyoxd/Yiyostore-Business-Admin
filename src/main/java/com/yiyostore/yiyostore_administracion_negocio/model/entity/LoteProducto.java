@@ -105,8 +105,8 @@ public class LoteProducto {
         setCantidad(cantidad);
         this.linkDeCompra = linkDeCompra;
         this.notas = notas;
-        this.estado = estado != null ? estado : Estado.NUEVO;
-        this.fecha = fecha != null ? fecha : LocalDate.now();
+        setEstado(estado);
+        setFecha(fecha);
     }
 
     /**
@@ -140,14 +140,7 @@ public class LoteProducto {
         if (producto == null) {
             throw new IllegalArgumentException("El producto no puede ser nulo");
         }
-        
-        if (this.producto == producto) {
-            return;
-        }
-        
-        
-        
-        
+        this.producto = producto;
     }
 
     /**
@@ -247,7 +240,7 @@ public class LoteProducto {
      * @param estado El nuevo estado del producto.
      */
     public void setEstado(Estado estado) {
-        this.estado = estado;
+        this.estado = estado != null ? estado : Estado.NUEVO;
     }
 
     /**
@@ -307,7 +300,7 @@ public class LoteProducto {
         StringBuilder sb = new StringBuilder();
         sb.append("LoteProducto{")
                 .append("id=").append(id)
-                .append(", producto=").append(producto)
+                .append(", producto=").append(producto != null ? producto.getNombre() : null)
                 .append(", costo=").append(costo)
                 .append(", cantidadDisponible=").append(cantidad)
                 .append(", linkDeCompra='").append(linkDeCompra).append('\'')

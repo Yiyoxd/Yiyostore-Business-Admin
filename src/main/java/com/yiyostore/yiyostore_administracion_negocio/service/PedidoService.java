@@ -122,7 +122,7 @@ public class PedidoService {
      * para cumplir con el pedido.
      */
     public List<DetallePedido> crearDetallesProducto(Producto producto, int cantidad) {
-        List<LoteProducto> lotes = obtenerLotesOrdenadosPorFecha(producto);
+        List<LoteProducto> lotes = obtenerLotesOrdenadosPorFechaNoVacios(producto);
         List<DetallePedido> detalles = new ArrayList<>();
 
         for (LoteProducto lote : lotes) {
@@ -231,13 +231,13 @@ public class PedidoService {
 
     /**
      * Obtiene una lista de lotes de un producto, ordenados por fecha de
-     * adquisición en orden ascendente.
+     * adquisición en orden ascendente y con cantidades mayores a 1.
      *
      * @param producto el producto del cual obtener los lotes.
      * @return una lista de lotes ordenados por fecha de adquisición.
      */
-    private List<LoteProducto> obtenerLotesOrdenadosPorFecha(Producto producto) {
-        return loteProductoRepository.findByProductoAndEstadoInOrderByFechaAsc(producto, List.of(Estado.NUEVO, Estado.REACONDICIONADO));
+    private List<LoteProducto> obtenerLotesOrdenadosPorFechaNoVacios(Producto producto) {
+        return loteProductoRepository.findByProductoAndEstadoInAndCantidadGreaterThanOrderByFechaAsc(producto, List.of(Estado.NUEVO, Estado.REACONDICIONADO), 0);
     }
 
     /**

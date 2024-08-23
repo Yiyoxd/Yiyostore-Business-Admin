@@ -1,12 +1,9 @@
 package com.yiyostore.yiyostore_administracion_negocio.service;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.entity.LoteProducto;
 import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
-import com.yiyostore.yiyostore_administracion_negocio.repository.ProductoRepository;
+import com.yiyostore.yiyostore_administracion_negocio.repository.LoteProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Servicio que maneja la lógica de inventario, incluyendo verificación de
@@ -15,8 +12,12 @@ import java.util.List;
 @Service
 public class InventarioService {
 
+    private final LoteProductoRepository loteProductoRepository;
+
     @Autowired
-    private ProductoRepository productoRepository;
+    public InventarioService(LoteProductoRepository loteProductoRepository) {
+        this.loteProductoRepository = loteProductoRepository;
+    }
 
     /**
      * Verifica si hay suficiente stock para cubrir la cantidad solicitada.
@@ -40,17 +41,6 @@ public class InventarioService {
      * @return El costo total del inventario.
      */
     public double calcularCostoTotalInventario() {
-        double costoTotalInventario = 0.0;
-
-        List<Producto> productos = productoRepository.findAll();
-
-        for (Producto producto : productos) {
-            for (LoteProducto lote : producto.getLotes()) {
-                costoTotalInventario += lote.getCosto() * lote.getCantidad();
-            }
-        }
-
-        return costoTotalInventario;
+        return loteProductoRepository.calcularCostoTotalInventario();
     }
-
 }
