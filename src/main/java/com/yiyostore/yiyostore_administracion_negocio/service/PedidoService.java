@@ -1,7 +1,7 @@
 package com.yiyostore.yiyostore_administracion_negocio.service;
 
 import com.yiyostore.yiyostore_administracion_negocio.exception.InsufficientStockException;
-import com.yiyostore.yiyostore_administracion_negocio.model.Estado;
+import com.yiyostore.yiyostore_administracion_negocio.model.enums.Estado;
 import com.yiyostore.yiyostore_administracion_negocio.model.EstadoPedido;
 import com.yiyostore.yiyostore_administracion_negocio.model.dto.DetallePedidoDTO;
 import com.yiyostore.yiyostore_administracion_negocio.model.dto.PedidoDTO;
@@ -67,7 +67,7 @@ public class PedidoService {
     public Pedido realizarPedidoDTO(PedidoDTO pedidoDTO) {
         List<DetallePedido> detalles = crearDetallesDesdeDTO(pedidoDTO.detalles());
         Cliente cliente = clienteRepository.findById(pedidoDTO.clienteId()).orElseThrow();
-        
+
         Pedido pedido = new Pedido(
                 cliente,
                 pedidoDTO.fecha(),
@@ -77,9 +77,8 @@ public class PedidoService {
                 pedidoDTO.notas(),
                 EstadoPedido.PENDIENTE
         );
-        
+
         detalles.forEach(detalle -> detalle.cambiarDePedidoSinVerificar(pedido));
-        
         return pedidoRepository.save(pedido);
     }
 

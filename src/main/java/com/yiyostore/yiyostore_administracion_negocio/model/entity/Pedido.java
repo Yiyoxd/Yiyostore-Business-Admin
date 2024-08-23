@@ -1,10 +1,22 @@
 package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.yiyostore.yiyostore_administracion_negocio.model.EstadoPedido;
 import com.yiyostore.yiyostore_administracion_negocio.model.enums.LugarCompra;
 import com.yiyostore.yiyostore_administracion_negocio.model.enums.MetodoPago;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +58,7 @@ public class Pedido {
      * lote específico que se incluyó en el pedido.
      */
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<DetallePedido> detalles = new ArrayList<>();
 
     /**
@@ -326,6 +339,6 @@ public class Pedido {
     @Override
     public String toString() {
         return String.format("Pedido{id=%d, cliente=%s, fecha=%s, metodoPago=%s, lugarCompra=%s, estado=%s, detalles=%s, notas='%s'}",
-                id, cliente != null ? cliente.getId() : "N/A", fecha, metodoPago, lugarCompra, estado, detalles, notas);
+                id, cliente != null ? cliente.getNombre() : "N/A", fecha, metodoPago, lugarCompra, estado, detalles, notas);
     }
 }

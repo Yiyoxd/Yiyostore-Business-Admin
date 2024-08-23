@@ -1,7 +1,14 @@
 package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +60,7 @@ public class Producto {
      * Fecha en que el producto fue añadido al inventario.
      */
     @Column(name = "fecha_adicion")
-    private LocalDate fechaAdicion;
+    private LocalDate fechaAdicion = LocalDate.now();
 
     /**
      * Constructor vacío requerido por JPA.
@@ -73,7 +80,7 @@ public class Producto {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.setPrecio(precio);
-        this.fechaAdicion = fechaAdicion != null ? fechaAdicion : LocalDate.now();
+        setFechaAdicion(fechaAdicion);
     }
 
     /**
@@ -167,17 +174,17 @@ public class Producto {
      *
      * @return La fecha de adición del producto.
      */
-    public LocalDate getFechaDeAdicion() {
+    public LocalDate getFechaAdicion() {
         return fechaAdicion;
     }
 
     /**
      * Establece la fecha en que el producto fue añadido al inventario.
      *
-     * @param fechaDeAdicion La nueva fecha de adición del producto.
+     * @param fechaAdicion La nueva fecha de adición del producto.
      */
-    public void setFechaDeAdicion(LocalDate fechaDeAdicion) {
-        this.fechaAdicion = fechaDeAdicion;
+    public void setFechaAdicion(LocalDate fechaAdicion) {
+        this.fechaAdicion = fechaAdicion != null ? fechaAdicion : LocalDate.now();
     }
 
     /**
@@ -190,7 +197,7 @@ public class Producto {
         if (lote == null) {
             throw new IllegalArgumentException("El lote no puede ser nulo");
         }
-        
+
         if (!this.lotes.contains(lote)) {
             lote.setProducto(this);
             this.lotes.add(lote);
@@ -233,8 +240,7 @@ public class Producto {
      */
     @Override
     public String toString() {
-        return String.format("Producto {\n  id=%d,\n  nombre='%s',\n  descripcion='%s',\n  precio=%.2f,\n  lotes=%s,\n  fechaDeAdicion=%s\n}",
+        return String.format("Producto {\n  id=%d,\n  nombre='%s',\n  descripcion='%s',\n  precio=%.2f,\n  lotes=%s,\n  fechaAdicion=%s\n}",
                 id, nombre, descripcion, precio, lotes, fechaAdicion);
     }
-
 }

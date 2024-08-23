@@ -1,6 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.Estado;
+import com.yiyostore.yiyostore_administracion_negocio.model.enums.Estado;
 import com.yiyostore.yiyostore_administracion_negocio.model.entity.LoteProducto;
 import com.yiyostore.yiyostore_administracion_negocio.model.entity.Producto;
 import com.yiyostore.yiyostore_administracion_negocio.repository.ProductoRepository;

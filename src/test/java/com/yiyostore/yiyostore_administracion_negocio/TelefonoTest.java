@@ -1,8 +1,10 @@
 package com.yiyostore.yiyostore_administracion_negocio;
 
 import com.yiyostore.yiyostore_administracion_negocio.model.entity.Cliente;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class TelefonoTest {
 

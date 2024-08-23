@@ -1,7 +1,5 @@
 package com.yiyostore.yiyostore_administracion_negocio.model.enums;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.*;
-
 /**
  * Enumeración que representa los distintos métodos de pago disponibles en el
  * sistema de gestión de dispositivos. Proporciona una lista de opciones

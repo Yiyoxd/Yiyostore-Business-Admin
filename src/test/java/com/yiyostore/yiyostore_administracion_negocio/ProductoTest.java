@@ -42,7 +42,7 @@ public class ProductoTest {
         assertThat(producto.getDescripcion()).isEqualTo("Descripción del Producto A");
         assertThat(producto.getPrecio()).isEqualTo(200.0);
         assertThat(producto.getLotes()).hasSize(2);
-        assertThat(producto.getFechaDeAdicion()).isNotNull();
+        assertThat(producto.getFechaAdicion()).isNotNull();
     }
 
     @Test

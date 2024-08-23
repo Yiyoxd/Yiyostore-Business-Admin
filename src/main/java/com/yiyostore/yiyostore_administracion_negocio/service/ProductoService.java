@@ -75,7 +75,7 @@ public class ProductoService {
             existingProducto.setNombre(updatedProducto.getNombre());
             existingProducto.setDescripcion(updatedProducto.getDescripcion());
             existingProducto.setPrecio(updatedProducto.getPrecio());
-            existingProducto.setFechaDeAdicion(updatedProducto.getFechaDeAdicion());
+            existingProducto.setFechaAdicion(updatedProducto.getFechaAdicion());
             return productoRepository.save(existingProducto);
         });
     }

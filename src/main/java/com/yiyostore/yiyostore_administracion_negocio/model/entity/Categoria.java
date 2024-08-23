@@ -1,7 +1,14 @@
 package com.yiyostore.yiyostore_administracion_negocio.model.entity;
 
 import com.yiyostore.yiyostore_administracion_negocio.model.enums.CategoriaEnum;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
  * Representa una categoría a la que pueden pertenecer los productos. Se eliminó

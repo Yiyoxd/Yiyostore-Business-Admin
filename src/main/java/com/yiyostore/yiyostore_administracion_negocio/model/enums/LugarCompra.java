@@ -1,6 +1,5 @@
 package com.yiyostore.yiyostore_administracion_negocio.model.enums;
 
-import com.yiyostore.yiyostore_administracion_negocio.model.*;
 
 /**
  * Enumeración que representa los distintos lugares de compra disponibles en el
