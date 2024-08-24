@@ -1,5 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.controller;
 
+import com.yiyostore.yiyostore_administracion_negocio.model.dto.ColoniaDTO;
 import com.yiyostore.yiyostore_administracion_negocio.model.entity.Colonia;
 import com.yiyostore.yiyostore_administracion_negocio.service.ColoniaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,4 +94,11 @@ public class ColoniaController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/search/{nombre}")
+    public ResponseEntity<List<ColoniaDTO>> searchColonias(@PathVariable String nombre) {
+        List<ColoniaDTO> colonias = coloniaService.searchColonias(nombre);
+        return ResponseEntity.ok(colonias);
+    }
+
 }

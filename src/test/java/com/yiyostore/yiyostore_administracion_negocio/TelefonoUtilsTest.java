@@ -25,6 +25,14 @@ public class TelefonoUtilsTest {
     }
 
     @Test
+    public void testNormalizarNumeroValidoConEspaciosXD() {
+        String numeroTelefono = "+52 1 871 786 1794";
+        String numeroEsperado = "8717861794";
+        String numeroNormalizado = TelefonoUtils.normalizar(numeroTelefono);
+        assertEquals(numeroEsperado, numeroNormalizado);
+    }
+
+    @Test
     public void testNormalizarNumeroValidoConCodigoPais() {
         String numeroTelefono = "+52 871 414 0550";
         String numeroEsperado = "8714140550";

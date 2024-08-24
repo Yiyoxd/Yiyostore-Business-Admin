@@ -1,5 +1,6 @@
 package com.yiyostore.yiyostore_administracion_negocio.service;
 
+import com.yiyostore.yiyostore_administracion_negocio.model.dto.ColoniaDTO;
 import com.yiyostore.yiyostore_administracion_negocio.model.entity.Colonia;
 import com.yiyostore.yiyostore_administracion_negocio.repository.ColoniaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Servicio para manejar la lógica de negocio relacionada con las Colonias.
@@ -67,5 +69,22 @@ public class ColoniaService {
     public boolean existsById(Long id) {
         return coloniaRepository.existsById(id);
     }
-
+    
+    /**
+     * Busca colonias cuyo nombre contenga el término de búsqueda.
+     *
+     * @param nombre El término de búsqueda.
+     * @return Una lista de colonias que coinciden con el término de búsqueda.
+     */
+    public List<ColoniaDTO > searchColonias(String nombre) {
+        List<Colonia> colonias = coloniaRepository.findByNombreContainingIgnoreCase(nombre);
+        return colonias.stream()
+                .map(colonia -> new ColoniaDTO(
+                        colonia.getId(),
+                        colonia.getNombre(),
+                        colonia.getCodigoPostal(),
+                        colonia.getCiudad().getNombre()
+                ))
+                .collect(Collectors.toList());
+    }
 }
